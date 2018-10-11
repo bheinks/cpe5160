@@ -74,3 +74,53 @@ uint8_t send_command(uint8_t command, uint32_t argument)
     
     return return_value;
 }
+
+uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
+{
+    uint8_t SPI_val, count, error_flag, response;
+    response = NO_ERROR;
+    count = 0;
+
+    // Keep transmitting until a response is received or timeout occurs
+	do
+    {
+        error_flag = SPI_transfer(0xFF, &SPI_val);
+        count++;
+    }while(((SPI_val&0x80) == 0x80) && (error_flag == NO_ERROR) && (count != 0));
+	 
+	// Error handling
+    if (error_flag != NO_ERROR)
+    {
+        response = SPI_ERROR;
+    }
+	else if (count == 0)
+    {
+		response = TIMEOUT_ERROR;
+    }
+	else if ((SPI_val&0xFE) != 0x00)
+    {
+        *byte_array = SPI_val;
+        response = COMM_ERROR;
+    }
+       
+	// No errors found
+	else
+	{
+        *byte_array = SPI_val;
+        if(num_bytes > 1) // If the response is greater than one byte
+        {
+            for(count = 1; count < num_bytes; count++)
+            {
+                error_flag = SPI_transfer(0xFF, &SPI_val);
+                *(byte_array + count) = SPI_val;
+            }
+        }
+        else
+        {
+          response = RESPONSE_ERROR;
+        }
+    }
+    error_flag = SPI_transfer(0xFF, &SPI_val);  // End with sending one last 0xFF out of the SPI port
+			
+    return response;
+ }
