@@ -6,7 +6,7 @@ uint8_t send_command(uint8_t command, uint32_t argument)
 {
     uint8_t rec_value, argument_LSB, argument_byte1, argument_byte2, argument_MSB, command_end, return_value, error_flag;
     
-    //check if CMD value is valid (less than 64)
+    // check if CMD value is valid (less than 64)
     if(command < 64){
         return_value = NO_ERROR;
     }
@@ -19,13 +19,13 @@ uint8_t send_command(uint8_t command, uint32_t argument)
     command &= 0x40;
     
     // set commandend based on necessary CRC7 and end bit
-    if(command == 0x40){      //CMD0
+    if(command == 0x40){      // CMD0
         command_end = 0x95;
     }
-    else if(command == 0x48){ //CMD8
+    else if(command == 0x48){ // CMD8
         command_end = 0xAA;
     }
-    else{                    //all other commands require no checksum
+    else{                    // all other commands require no checksum
         command_end = 0x55;
     }
     
