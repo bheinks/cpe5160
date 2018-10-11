@@ -10,6 +10,7 @@
 #include "main.h"
 #include "PORT.h"
 #include "UART.h"
+#include "Long_Serial_In.h"
 #include "delay.h"
 #include "LCD.h"
 
@@ -22,7 +23,7 @@ uint8_t code line1_string[] = "Line 1 test";
 uint8_t code line2_string[] = "Line 2 test";
 
 void main(void) {
-    AUXR = 0x0C;   // make all of XRAM available
+    AUXR = 0x0C; // make all of XRAM available
     
     if (OSC_PER_INST == 6) {
         CKCON0 = 0x01; // set x2 clock mode
