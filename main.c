@@ -22,7 +22,7 @@ uint8_t code line1_string[] = "Line 1 test";
 uint8_t code line2_string[] = "Line 2 test";
 
 void main(void) {
-    orange = 0;
+    AUXR = 0x0C;   // make all of XRAM available
     
     if (OSC_PER_INST == 6) {
         CKCON0 = 0x01; // set x2 clock mode
@@ -33,7 +33,7 @@ void main(void) {
     
     green = 0;
 	
-	//UART_init(9600);
+	UART_init(9600);
     
 	yellow = 0;
     delay(300);
@@ -41,10 +41,17 @@ void main(void) {
 	
     LCD_init();
     LCD_print(LINE1, 0, line1_string);
-    LCD_print(LINE2, 6, line2_string);
-    LCD_print(NO_ADDR_CHANGE, 7, (line2_string+11));
+    LCD_print(LINE2, 0, line2_string);
     
     red = 0;
 
-	while(1);
+	while(1) {
+        UART_transmit('f');
+        UART_transmit('a');
+        UART_transmit('r');
+        UART_transmit('t');
+        UART_transmit(CR);
+        UART_transmit(LF);
+        delay(1000);
+    }
 }
