@@ -117,7 +117,7 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
         }
         else
         {
-          response = RESPONSE_ERROR;
+          response = COMM_ERROR;
         }
     }
     error_flag = SPI_transfer(0xFF, &SPI_val);  // End with sending one last 0xFF out of the SPI port
