@@ -57,8 +57,6 @@ typedef long int32_t;
 #define Timer_1_Overflow 3
 #define Timer_2_Overflow 5
 
-void hardware_delay(const unsigned int);
-
 #endif
 
 /*------------------------------------------------------------------*-

@@ -1,5 +1,5 @@
 /*
-	CpE 5160 Experiment 1
+	CpE 5160 Experiment 2
 	Brett Heinkel
 	Michael Proemsey
 	Ian Piskulic
@@ -7,53 +7,44 @@
 
 #include <stdio.h>
 
-#include "Main.h"
+#include "main.h"
 #include "PORT.h"
-#include "uart.h"
-#include "memory_test.h"
-#include "print_bytes.h"
+#include "UART.h"
+#include "delay.h"
 #include "LCD.h"
 
 sbit green = P2^7;
 sbit orange = P2^6;
+sbit yellow = P2^5;
+sbit red = P2^4;
 
-uint8_t code LCD_string1[] = "Brett Heinkel";
+uint8_t code line1_string[] = "Line 1 test";
+uint8_t code line2_string[] = "Line 2 test";
 
-void main(void) {	
-	CKCON0 = 0x01;
+void main(void) {
+    orange = 0;
+    
+    if (OSC_PER_INST == 6) {
+        CKCON0 = 0x01; // set x2 clock mode
+    }
+    else {
+        CKCON0 = 0x00; // set standard clock mode
+    }
+    
+    green = 0;
 	
-	UART_Init();
+	//UART_init(9600);
+    
+	yellow = 0;
+    delay(300);
 	
-	green = 0;
-	hardware_delay(2000);
-	orange = 0;
 	
-	LCD_Init();
-	LCD_Write(1, set_address | line2);
-	LCD_Print(12, LCD_string1);
-	
-	/*hardware_delay(1);
-	LCD_Write(1, set_address | line2);
-	LCD_Output_Display(11, LCD_string2);*/
-	
-	/*code_memory = code_memory_init();
-	xdata_memory = xdata_memory_init();
-	
-	printf("Printing from code memory:\n");
-	print_memory(code_memory, 50);
-	
-	//DELAY_LOOP_Wait(2000);
-	
-	printf("Printing from xdata memory:\n");
-	print_memory(xdata_memory, 50);*/
+    LCD_init();
+    LCD_print(LINE1, 0, line1_string);
+    LCD_print(LINE2, 6, line2_string);
+    LCD_print(NO_ADDR_CHANGE, 7, (line2_string+11));
+    
+    red = 0;
 
 	while(1);
-}
-
-void hardware_delay(const unsigned int DELAY) {
-	unsigned int x, y;
-
-	for (x = 0; x <= DELAY; x++) {
-		for (y = 0; y <= 575; y++);
-	}
 }
