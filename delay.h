@@ -3,9 +3,9 @@
 
 #include "main.h"
 
-#define TIMER_RELOAD (65536-((OSC_FREQ)/(1020*OSC_PER_INST)))
-#define TIMER_RELOAD_THx (TIMER_RELOAD>>8)
-#define TIMER_RELOAD_TLx (TIMER_RELOAD&0xFF)
+#define TIMER_RELOAD ((uint16_t)(65536-(OSC_FREQ/(OSC_PER_INST*1020UL))))
+#define TIMER_RELOAD_THx (TIMER_RELOAD/256)
+#define TIMER_RELOAD_TLx (TIMER_RELOAD%256)
 
 void delay(uint16_t duration);
 
