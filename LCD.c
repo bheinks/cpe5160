@@ -12,14 +12,6 @@ void LCD_write(bit reg_select, uint8_t lcd_data) {
     RS = 1;
 }
 
-/*void LCD_write(bit RegSelect, uint8_t message) {
-  RS=RegSelect;
-  E=1;
-  P0=message;   
-  E=0;
-  P0=0xFF;
-}*/
-
 void LCD_init(void) {
     // 8-bit interface, 2 lines, 5x8 font
     LCD_write(COMMAND, FUNCTION_SET|TWO_LINE|SET_5x8); 
@@ -43,24 +35,6 @@ void LCD_init(void) {
     LCD_write(COMMAND, ENTRY_MODE|SHIFT_RIGHT|CURSOR);
     delay(1);
 }
-
-/*void LCD_Init(void) {
-	hardware_delay(30);
-	LCD_write(command, function_set); // Function set x4
-	hardware_delay(5);										
-	LCD_write(command, function_set);
-	hardware_delay(1);								
-	LCD_write(command, function_set);
-	hardware_delay(1);
-	LCD_write(command, function_set);
-	hardware_delay(1);
-	LCD_write(command, lcd_on); // Display on
-	hardware_delay(1);
-	LCD_write(command, lcd_clear); // Display clear
-	hardware_delay(1);				
-	LCD_write(command, dec_mode); // Entry mode set
-	hardware_delay(1);
-}*/
 
 void LCD_print(uint8_t address, uint8_t num_bytes, uint8_t *string_p) {
     uint8_t character, index;
@@ -89,12 +63,3 @@ void LCD_print(uint8_t address, uint8_t num_bytes, uint8_t *string_p) {
         }
     }
 }
-
-/*void LCD_print(uint8_t byte_count, uint8_t *array)
-{
-	uint8_t i;
-	for(i = 0; i < byte_count; i++) {
-		hardware_delay(500);
-		LCD_write(1, *(array + i));
-	}
-}*/

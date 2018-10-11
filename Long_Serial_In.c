@@ -25,7 +25,7 @@ uint32_t long_serial_input(void)
       index=0;
       do
       {
-         input=UART_Receive();
+         input=UART_receive();
          if((input>=0x30)&&(input<=0x39))
          {
            input_values[index]=input;
@@ -36,15 +36,15 @@ uint32_t long_serial_input(void)
          {
            index--;
            input_values[index]=0;
-           UART_Transmit(BS);
-           UART_Transmit(space);
-           UART_Transmit(BS);
+           UART_transmit(BS);
+           UART_transmit(space);
+           UART_transmit(BS);
          }
          else if ((input==CR)||(input==LF))
          {
             output_value=atol(input_values);
-            UART_Transmit(CR);
-			UART_Transmit(LF);
+            UART_transmit(CR);
+			UART_transmit(LF);
          }
          else
          {
@@ -53,8 +53,8 @@ uint32_t long_serial_input(void)
          if(index==10)
          {
             output_value=atol(input_values);
-            UART_Transmit(CR);
-			UART_Transmit(LF);
+            UART_transmit(CR);
+			UART_transmit(LF);
          }
       }while(output_value==0xffffffff);
 

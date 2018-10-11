@@ -52,26 +52,3 @@ void LCD_init(void);
 void LCD_print(uint8_t address, uint8_t num_bytes, uint8_t * string_p);
 
 #endif
-
-/*
-#define function_set 0x3C // 2 line mode and display on
-
-// LCD commands
-#define lcd_on 0x0C
-#define lcd_off 0x08 // Turns off any display function
-#define lcd_clear 0x01
-#define cursor_on 0x0A
-#define blink_on 0x09
-
-// Entry Mode
-#define dec_mode 0x06 // Right to left
-#define inc_mode 0x04 // Left to right
-#define shift_on 0x05
-
-
-void LCD_Write(bit RegSelect, uint8_t message);
-void LCD_Init(void);
-void LCD_Print(uint8_t byte_count, uint8_t *array);
-
-#endif
-*/
