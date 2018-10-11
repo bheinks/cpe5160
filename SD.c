@@ -35,37 +35,37 @@ uint8_t send_command(uint8_t command, uint32_t argument)
 
     
     //send 6 byte command while checking for errors
-    SPI_transfer(command, &rec_value);
+    error_flag = SPI_transfer(command, &rec_value);
     if(error_flag != NO_ERROR)
     {
         return_value = SPI_ERROR;
         return return_value;
     }    
-    SPI_transfer(argument_MSB, &rec_value);
+    error_flag = SPI_transfer(argument_MSB, &rec_value);
         if(error_flag != NO_ERROR)
     {
         return_value = SPI_ERROR;
         return return_value;
     }    
-    SPI_transfer(argument_byte2, &rec_value);
+    error_flag = SPI_transfer(argument_byte2, &rec_value);
         if(error_flag != NO_ERROR)
     {
         return_value = SPI_ERROR;
         return return_value;
     }    
-    SPI_transfer(argument_byte1, &rec_value);
+    error_flag = SPI_transfer(argument_byte1, &rec_value);
         if(error_flag != NO_ERROR)
     {
         return_value = SPI_ERROR;
         return return_value;
     }    
-    SPI_transfer(argument_LSB, &rec_value);
+    error_flag = SPI_transfer(argument_LSB, &rec_value);
         if(error_flag != NO_ERROR)
     {
         return_value = SPI_ERROR;
         return return_value;
     }    
-    SPI_transfer(command_end, &rec_value);
+    error_flag = SPI_transfer(command_end, &rec_value);
         if(error_flag != NO_ERROR)
     {
         return_value = SPI_ERROR;
