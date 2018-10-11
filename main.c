@@ -10,9 +10,10 @@
 #include "main.h"
 #include "PORT.h"
 #include "UART.h"
-#include "Long_Serial_In.h"
 #include "delay.h"
 #include "LCD.h"
+#include "SPI.h"
+#include "Long_Serial_In.h"
 
 sbit green = P2^7;
 sbit orange = P2^6;
@@ -23,6 +24,8 @@ uint8_t code line1_string[] = "Line 1 test";
 uint8_t code line2_string[] = "Line 2 test";
 
 void main(void) {
+    uint8_t status;
+    
     AUXR = 0x0C; // make all of XRAM available
     
     if (OSC_PER_INST == 6) {
@@ -31,28 +34,24 @@ void main(void) {
     else {
         CKCON0 = 0x00; // set standard clock mode
     }
-    
-    green = 0;
 	
 	UART_init(9600);
-    
-	yellow = 0;
     delay(300);
-	
+    
+    if((status = SPI_master_init(400000)) != 0) {
+        red = 0;
+    }
+    else {
+        green = 0;
+    }
+    
 	
     LCD_init();
     LCD_print(LINE1, 0, line1_string);
     LCD_print(LINE2, 0, line2_string);
-    
-    red = 0;
 
 	while(1) {
-        UART_transmit('f');
-        UART_transmit('a');
-        UART_transmit('r');
-        UART_transmit('t');
-        UART_transmit(CR);
-        UART_transmit(LF);
+        printf("status: %2.2X", status);
         delay(1000);
     }
 }

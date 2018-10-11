@@ -6,11 +6,27 @@ uint8_t SPI_master_init(uint32_t clock_freq) {
     divider = (OSC_FREQ * 6) / (OSC_PER_INST * clock_freq);
     return_value = 0;
     
+    // set SPCON depending on divider value
     if (divider < 2) {
         SPCON = 0x70 | (CPOL << 3) | (CPHA << 2);
     }
     else if (divider < 4) {
         SPCON = 0x71 | (CPOL << 3) | (CPHA << 2);
+    }
+    else if (divider < 8) {
+        SPCON = 0x72 | (CPOL << 3) | (CPHA << 2);
+    }
+    else if (divider < 16) {
+        SPCON = 0x73 | (CPOL << 3) | (CPHA << 2);
+    }
+    else if (divider < 32) {
+        SPCON = 0xF0 | (CPOL << 3) | (CPHA << 2);
+    }
+    else if (divider < 64) {
+        SPCON = 0xF1 | (CPOL << 3) | (CPHA << 2);
+    }
+    else if (divider < 128) {
+        SPCON = 0xF2 | (CPOL << 3) | (CPHA << 2);
     }
     else {
         return_value = CLOCK_RATE_ERROR;
