@@ -14,7 +14,7 @@ void delay(uint16_t duration) {
         TL0 = TIMER_RELOAD_TLx;
 
         TF0 = 0; // clear overflow flag
-        TL0 = 1; // start timer 0
+        TR0 = 1; // start timer 0
 
         while (TF0 == 0);
 
