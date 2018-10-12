@@ -7,6 +7,7 @@
 #define SD_INIT_ERROR 0xE1
 #define COMM_ERROR 0xE3
 #define DATA_ERROR 0xE4
+#define SEND_ERROR 0xE5
 
 // SD card commands 
 #define CMD0 0

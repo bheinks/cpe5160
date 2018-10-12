@@ -136,7 +136,7 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
 }
 
 uint8_t SD_card_init(void) {
-    uint8_t index, receive_array[8], error_flag, timeout, return_value, i;
+    uint8_t index, receive_array[8], error_flag, timeout, return_value, i, error_message;
 
     timeout = 1; //initialize timeout variable
     
@@ -157,7 +157,7 @@ uint8_t SD_card_init(void) {
     green = 0;
     
     
-    nCS0 = 0;
+    
     
     // Check for error
     if(error_flag != NO_ERROR){
@@ -167,12 +167,12 @@ uint8_t SD_card_init(void) {
     
     //send CMD0 to SD card
     printf("CMD0 sent...\n");
+    nCS0 = 0;
     error_flag = send_command(CMD0, 0);
     
     //check for error
     if(error_flag != NO_ERROR){
-        printf("CMD0 send error\n");
-        return SD_INIT_ERROR;
+        error_message = SEND_ERROR;
     }
     
     //receive response from SD card
@@ -181,7 +181,12 @@ uint8_t SD_card_init(void) {
     
     printf("R1 Response expected\n");
     if(error_flag != NO_ERROR){
+        if(error_message == SEND_ERROR){
+            printf("CMD0 send error\n");
+        }
+        else{
         printf("CMD0 receive error\n");
+        }
         return SD_INIT_ERROR;
     }
     else if(receive_array[0] != 0x01){
