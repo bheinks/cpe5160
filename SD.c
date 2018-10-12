@@ -81,7 +81,7 @@ uint8_t send_command(uint8_t command, uint32_t argument)
     return return_value;
 }
 
-uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
+/*uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
 {
     uint8_t SPI_val, count, error_flag, response;
     response = NO_ERROR;
@@ -134,6 +134,47 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
     error_flag = SPI_transfer(0xFF, &SPI_val);  // End with sending one last 0xFF out of the SPI port
 			
     return response;
+}*/
+
+uint8_t receive_response(uint8_t num_bytes, uint8_t * valout)
+{
+   uint8_t index,return_val,error_flag, SPI_return;
+
+   return_val=NO_ERROR;
+   do
+   {
+      error_flag=SPI_transfer(0xFF,&SPI_return);
+      index++;
+   }while(((SPI_return&0x80)==0x80)&&(index!=0)&&(error_flag==NO_ERROR));
+   if(error_flag!=NO_ERROR)
+   {
+      return_val=SPI_ERROR;
+   }
+   else if(index==0)
+   {
+      return_val=TIMEOUT_ERROR;
+   }
+   else
+   {
+     *valout=SPI_return;
+     if((SPI_return==0x00)||(SPI_return==0x01))
+     {
+       if(num_bytes>1)
+       {
+         for(index=1;index<num_bytes;index++)
+         {
+            error_flag=SPI_transfer(0xFF,&SPI_return);
+            *(valout+index)=SPI_return;
+         }
+       }
+     }
+     else
+     {
+        return_val=COMM_ERROR;
+     }
+   }
+   error_flag=SPI_transfer(0xFF,&SPI_return);  // send 8 more clock cycles to complete read
+   return return_val;
 }
 
 uint8_t SD_card_init(void) {
