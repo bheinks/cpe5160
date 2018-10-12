@@ -50,14 +50,17 @@ uint8_t SPI_transfer(uint8_t send_value, uint8_t * rec_value) {
     if (timeout == 0) {
         error_flag = TIMEOUT_ERROR;
         *rec_value = 0xFF;
+        printf("(SPI_transfer) TIMEOUT_ERROR\n");
     }
     else if ((status & 0x70) != 0) {
         error_flag = SPI_ERROR;
         *rec_value = 0xFF;
+        printf("(SPI_transfer) SPI_ERROR\n");
     }
     else {
         error_flag = NO_ERROR;
         *rec_value = SPDAT;
+        printf("(SPI_transfer) NO_ERROR\n");
     }
     
     return error_flag;
