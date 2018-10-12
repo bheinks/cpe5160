@@ -396,3 +396,62 @@ uint8_t SD_card_init(void) {
     
     return NO_ERROR;
 }
+
+uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
+    uint8_t SPI_val, count, error_flag, response;
+    
+    response = NO_ERROR;
+    count = 0;
+    
+    // keep transmitting until a response is received or timeout occurs
+	do {
+        error_flag = SPI_transfer(0xFF, &SPI_val);
+        count++;
+    } while (((SPI_val & 0x80) == 0x80) && (error_flag == NO_ERROR) && (count != 0));
+    
+    // error handling
+    if (error_flag != NO_ERROR) {
+        response = SPI_ERROR;
+    }
+	else if (count == 0) {
+		response = TIMEOUT_ERROR;
+    }
+	else if ((SPI_val & 0xFE) != 0x00) {
+        *byte_array = SPI_val;
+        response = COMM_ERROR;
+    }
+    else {
+        count = 0;
+        
+        // wait for data token
+        do {
+            error_flag = SPI_transfer(0xFF, &SPI_val);
+            count++;
+        } while ((SPI_val == 0xFF) && (error_flag == NO_ERROR) && (count != 0));
+        
+        if (error_flag != NO_ERROR) {
+            response = SPI_ERROR;
+        }
+        else if (count == 0) {
+            response = TIMEOUT_ERROR;
+        }
+        else if (SPI_val == 0xFE) {
+            for (count = 0; count < num_bytes; ++count) {
+                error_flag = SPI_transfer(0xFF, &SPI_val);
+                *(byte_array + count) = SPI_val;
+            }
+            
+            // discard CRC
+            error_flag = SPI_transfer(0xFF, &SPI_val);
+            error_flag = SPI_transfer(0xFF, &SPI_val);
+        }
+        else {
+            response = DATA_ERROR;
+        }
+    }
+    
+    // return to standby state
+    error_flag = SPI_transfer(0xFF, &SPI_val);
+    
+    return response;
+}

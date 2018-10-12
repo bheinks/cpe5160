@@ -15,6 +15,7 @@
 #include "SPI.h"
 #include "Long_Serial_In.h"
 #include "SD.h"
+#include "print_bytes.h"
 
 sbit green = P2^7;
 sbit orange = P2^6;
@@ -25,7 +26,8 @@ uint8_t code line1_string[] = "Line 1 test";
 uint8_t code line2_string[] = "Line 2 test";
 
 void main(void) {
-    uint8_t status;
+    uint8_t status, block_num;
+    uint8_t block_data[8];
     
     AUXR = 0x0C; // make all of XRAM available
     
@@ -40,7 +42,7 @@ void main(void) {
 	UART_init(9600);
     delay(300);
     
-	// Initialize SPI
+	// Initialize SPI at 400 KHz
     SPI_master_init(400000);
     
    // Initialize SD card
@@ -49,17 +51,30 @@ void main(void) {
    if(status !=  NO_ERROR)
    {
       green = 0;
-      while(1);
    }
    else{ //pause program to allow error message to be read
        while(1);
    }
-           
-	
-	// Initialize LCD
-    LCD_init();
-    LCD_print(LINE1, 0, line1_string);
-    LCD_print(LINE2, 0, line2_string);
-
-
+   
+   // Set clock to 25 MHz
+   status = SPI_master_init(25000000UL);
+   
+   // Super Loop
+   while (1)
+   {
+       // Get block number from user
+       printf("Enter block number = ");
+       block_num = (uint32_t)long_serial_input();
+     
+       // Send command and grab block
+       nCS0 = 0;
+       status = send_command(CMD17, block_num);
+       read_block(512, &block_data); 
+       print_memory(block_data, 512);
     }
+           
+      // Initialize LCD
+//    LCD_init();
+//    LCD_print(LINE1, 0, line1_string);
+//    LCD_print(LINE2, 0, line2_string);
+}
