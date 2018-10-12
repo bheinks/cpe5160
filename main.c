@@ -14,6 +14,7 @@
 #include "LCD.h"
 #include "SPI.h"
 #include "Long_Serial_In.h"
+#include "SD.h"
 
 sbit green = P2^7;
 sbit orange = P2^6;
@@ -35,9 +36,11 @@ void main(void) {
         CKCON0 = 0x00; // set standard clock mode
     }
 	
+	// Initialize UART
 	UART_init(9600);
     delay(300);
     
+	// Initialize SPI
     if((status = SPI_master_init(400000)) != 0) {
         red = 0;
     }
@@ -45,7 +48,16 @@ void main(void) {
         green = 0;
     }
     
+   // Initialize SD card
+   printf("SD Card Initialization ... \n\r");
+   status = SD_card_init();
+   if(status !=  no_errors)
+   {
+      green = 0;
+      while(1);
+   }
 	
+	// Initialize LCD
     LCD_init();
     LCD_print(LINE1, 0, line1_string);
     LCD_print(LINE2, 0, line2_string);
