@@ -148,7 +148,7 @@ uint8_t SD_card_init(void) {
     *
     *************/
     
-    green = 0;
+
     
     
     
@@ -163,7 +163,6 @@ uint8_t SD_card_init(void) {
     printf("CMD0 sent...\n");
     nCS0 = 0;
     error_flag = send_command(CMD0, 0);
-    orange = 0;
     //check for error
     if(error_flag != NO_ERROR){
         error_message = SEND_ERROR;
@@ -172,7 +171,6 @@ uint8_t SD_card_init(void) {
     //receive response from SD card
     error_flag=receive_response(1, receive_array);
     nCS0 = 1;
-    yellow = 0;
     printf("R1 Response expected\n");
     if(error_flag != NO_ERROR){
         if(error_message == SEND_ERROR){
@@ -236,13 +234,13 @@ uint8_t SD_card_init(void) {
     }
     
     // Check for correct voltage
-    if((receive_array[2]&0xFC) != 0xFC){
+    if((receive_array[3]&0xFC) != 0xFC){
         printf("CMD8 incorrect voltage error\n");
         return SD_INIT_ERROR;
     }
     
     // Check for matching check byte
-    if(receive_array[5] != 0xAA){
+    if(receive_array[4] != 0xAA){
         printf("CMD8 check byte mismatch\n");
         return SD_INIT_ERROR;
     }
