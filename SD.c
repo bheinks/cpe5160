@@ -210,7 +210,7 @@ uint8_t SD_card_init(void) {
     }
     
     // Receive response from SD card
-    error_flag=receive_response(5, receive_array);
+    error_flag=receive_response(6, receive_array);
     nCS0 = 1;
     
     // Check for error
@@ -234,7 +234,7 @@ uint8_t SD_card_init(void) {
     }
     
     // Check for correct voltage
-    if((receive_array[3]&0xFC) != 0xFC){
+    if((receive_array[3]&0x0F) != 0x01){
         printf("CMD8 incorrect voltage error\n");
         return SD_INIT_ERROR;
     }
