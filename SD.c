@@ -81,20 +81,19 @@ uint8_t send_command(uint8_t command, uint32_t argument)
     return return_value;
 }
 
-/*uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
-{
+uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array) {
     uint8_t SPI_val, count, error_flag, response;
+    
     response = NO_ERROR;
     count = 0;
 
-    // Keep transmitting until a response is received or timeout occurs
+    // Keep transmitting until a response is valid received or timeout occurs
 	do
     {
         error_flag = SPI_transfer(0xFF, &SPI_val);
         count++;
-        green = 0;
-    }while(((SPI_val&0x80) == 0x80) && (error_flag == NO_ERROR) && (count != 0));
-        green = 1;
+    } while (((SPI_val&0x80) == 0x80) && (error_flag == NO_ERROR) && (count != 0));
+    
 	// Error handling
     if (error_flag != NO_ERROR)
     {
@@ -106,75 +105,28 @@ uint8_t send_command(uint8_t command, uint32_t argument)
 		response = TIMEOUT_ERROR;
         printf("TIMEOUT_ERROR\n");
     }
-	else if ((SPI_val&0xFE) != 0x00)
-    {
+    else {
         *byte_array = SPI_val;
-        response = COMM_ERROR;
-        printf("COMM_ERROR\n");
-    }
-       
-	// No errors found
-	else
-	{
-        *byte_array = SPI_val;
-        if(num_bytes > 1) // If the response is greater than one byte
-        {
-            for(count = 1; count < num_bytes; count++)
-            {
-                error_flag = SPI_transfer(0xFF, &SPI_val);
-                *(byte_array + count) = SPI_val;
+     
+        // if valid R1 response (active or idle)
+        if ((SPI_val == 0x00) || (SPI_val == 0x01)) {
+            if (num_bytes > 1) {
+                for (count = 1; count < num_bytes; ++count) {
+                    error_flag = SPI_transfer(0xFF, &SPI_val);
+                    *(byte_array + count) = SPI_val;
+                }
             }
         }
-        else
-        {
-          response = COMM_ERROR;
-          printf("COMM_ERROR2\n");
+        else {
+            response = COMM_ERROR;
+            printf("COMM_ERROR\n");
         }
     }
-    error_flag = SPI_transfer(0xFF, &SPI_val);  // End with sending one last 0xFF out of the SPI port
-			
+    
+    // End with sending one last 0xFF out of the SPI port
+    error_flag = SPI_transfer(0xFF, &SPI_val);
+    
     return response;
-}*/
-
-uint8_t receive_response(uint8_t num_bytes, uint8_t * valout)
-{
-   uint8_t index,return_val,error_flag, SPI_return;
-
-   return_val=NO_ERROR;
-   do
-   {
-      error_flag=SPI_transfer(0xFF,&SPI_return);
-      index++;
-   }while(((SPI_return&0x80)==0x80)&&(index!=0)&&(error_flag==NO_ERROR));
-   if(error_flag!=NO_ERROR)
-   {
-      return_val=SPI_ERROR;
-   }
-   else if(index==0)
-   {
-      return_val=TIMEOUT_ERROR;
-   }
-   else
-   {
-     *valout=SPI_return;
-     if((SPI_return==0x00)||(SPI_return==0x01))
-     {
-       if(num_bytes>1)
-       {
-         for(index=1;index<num_bytes;index++)
-         {
-            error_flag=SPI_transfer(0xFF,&SPI_return);
-            *(valout+index)=SPI_return;
-         }
-       }
-     }
-     else
-     {
-        return_val=COMM_ERROR;
-     }
-   }
-   error_flag=SPI_transfer(0xFF,&SPI_return);  // send 8 more clock cycles to complete read
-   return return_val;
 }
 
 uint8_t SD_card_init(void) {
@@ -284,7 +236,7 @@ uint8_t SD_card_init(void) {
     }
     
     // Check for correct voltage
-    if(receive_array[4] != 0x01){
+    if((receive_array[2]&0xFC) != 0xFC){
         printf("CMD8 incorrect voltage error\n");
         return SD_INIT_ERROR;
     }
