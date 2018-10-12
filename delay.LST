@@ -1,0 +1,47 @@
+C51 COMPILER V9.53.0.0   DELAY                                                             10/12/2018 14:45:19 PAGE 1   
+
+
+C51 COMPILER V9.53.0.0, COMPILATION OF MODULE DELAY
+OBJECT MODULE PLACED IN delay.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE delay.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "main.h"
+   2          #include "PORT.h"
+   3          #include "delay.h"
+   4          
+   5          void delay(uint16_t duration) {
+   6   1          TMOD &= 0xF0; // clear all T0 bits (T1 left unchanged)
+   7   1          TMOD |= 0x01; // set required T0 bits (T1 left unchanged)
+   8   1      
+   9   1          ET0 = 0; // no interrupts
+  10   1      
+  11   1          do {
+  12   2              // values for 1ms delay_1
+  13   2              TH0 = TIMER_RELOAD_THx;
+  14   2              TL0 = TIMER_RELOAD_TLx;
+  15   2      
+  16   2              TF0 = 0; // clear overflow flag
+  17   2              TR0 = 1; // start timer 0
+  18   2      
+  19   2              while (TF0 == 0);
+  20   2      
+  21   2              TR0 = 0; // stop timer 0
+  22   2              duration--;
+  23   2          } while (duration > 0);
+  24   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     38    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

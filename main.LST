@@ -1,0 +1,106 @@
+C51 COMPILER V9.53.0.0   MAIN                                                              10/12/2018 14:45:20 PAGE 1   
+
+
+C51 COMPILER V9.53.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*
+   2                  CpE 5160 Experiment 2
+   3                  Brett Heinkel
+   4                  Michael Proemsey
+   5                  Ian Piskulic
+   6          */
+   7          
+   8          #include <stdio.h>
+   9          
+  10          #include "main.h"
+  11          #include "PORT.h"
+  12          #include "UART.h"
+  13          #include "delay.h"
+  14          #include "LCD.h"
+  15          #include "SPI.h"
+  16          #include "Long_Serial_In.h"
+  17          #include "SD.h"
+  18          #include "print_bytes.h"
+  19          
+  20          sbit green = P2^7;
+  21          sbit orange = P2^6;
+  22          sbit yellow = P2^5;
+  23          sbit red = P2^4;
+  24          
+  25          uint8_t code line1_string[] = "Line 1 test";
+  26          uint8_t code line2_string[] = "Line 2 test";
+  27          
+  28          void main(void) {
+  29   1          uint8_t status, block_num;
+  30   1          uint8_t block_data[8];
+  31   1          
+  32   1          AUXR = 0x0C; // make all of XRAM available
+  33   1          
+  34   1          if (OSC_PER_INST == 6) {
+  35   2              CKCON0 = 0x01; // set x2 clock mode
+  36   2          }
+  37   1          else {
+  38   2              CKCON0 = 0x00; // set standard clock mode
+  39   2          }
+  40   1              
+  41   1              // Initialize UART
+  42   1              UART_init(9600);
+  43   1          delay(300);
+  44   1          
+  45   1              // Initialize SPI at 400 KHz
+  46   1          SPI_master_init(400000);
+  47   1          
+  48   1         // Initialize SD card
+  49   1         printf("SD Card Initialization ... \n\r");
+  50   1         status = SD_card_init();
+  51   1         if(status ==  NO_ERROR)
+  52   1         {
+  53   2            green = 0;
+  54   2         }
+  55   1         else{ //pause program to allow error message to be read
+C51 COMPILER V9.53.0.0   MAIN                                                              10/12/2018 14:45:20 PAGE 2   
+
+  56   2             while(1);
+  57   2         }
+  58   1         
+  59   1         // Set clock to 25 MHz
+  60   1         status = SPI_master_init(25000000UL);
+  61   1         
+  62   1         // Super Loop
+  63   1         while (1)
+  64   1         {
+  65   2             // Get block number from user
+  66   2             printf("Enter block number = ");
+  67   2             block_num = (uint32_t)long_serial_input();
+  68   2           
+  69   2             // Send command and grab block
+  70   2             nCS0 = 0;
+  71   2             status = send_command(CMD17, block_num);
+  72   2             read_block(512, &block_data); 
+  73   2             print_memory(block_data, 512);
+  74   2          }
+  75   1                 
+  76   1            // Initialize LCD
+  77   1      //    LCD_init();
+  78   1      //    LCD_print(LINE1, 0, line1_string);
+  79   1      //    LCD_print(LINE2, 0, line2_string);
+  80   1      }
+*** WARNING C294 IN LINE 38 OF main.c: unreachable code
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    128    ----
+   CONSTANT SIZE    =     76    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

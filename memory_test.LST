@@ -1,0 +1,66 @@
+C51 COMPILER V9.53.0.0   MEMORY_TEST                                                       10/12/2018 14:45:20 PAGE 1   
+
+
+C51 COMPILER V9.53.0.0, COMPILATION OF MODULE MEMORY_TEST
+OBJECT MODULE PLACED IN memory_test.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE memory_test.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "main.h"
+   2          #include "memory_test.h"
+   3          
+   4          static uint8_t code code_mem[]="Code Memory: String for Brett Heinkel";
+   5          static uint8_t xdata xdata_mem[50];
+   6          
+   7          /***********************************************************************
+   8          DESC:  Returns the pointer to a string in code memory
+   9          INPUT: global string definition
+  10          RETURNS: pointer to the global string definition
+  11          CAUTION: 
+  12          ************************************************************************/
+  13          uint8_t * code_memory_init(void)
+  14          {
+  15   1         return code_mem;
+  16   1      }
+  17          
+  18          
+  19          /***********************************************************************
+  20          DESC:  Copies a string of characters from code memory to xram
+  21          INPUT: uses two global pointers defined above
+  22          RETURNS: pointer to the string in xdata memory
+  23          CAUTION: 
+  24          ************************************************************************/
+  25          uint8_t * xdata_memory_init(void)
+  26          {
+  27   1         uint8_t index, value;
+  28   1         
+  29   1         index=0;
+  30   1         do
+  31   1         {
+  32   2             value=code_mem[index];
+  33   2             xdata_mem[index]=value;
+  34   2             index++;
+  35   2         }while(value!=0);
+  36   1         xdata_mem[0]='X';
+  37   1         xdata_mem[1]='R';
+  38   1         xdata_mem[2]='A';
+  39   1         xdata_mem[3]='M';
+  40   1         
+  41   1      
+  42   1         return xdata_mem;
+  43   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     55    ----
+   CONSTANT SIZE    =     38    ----
+   XDATA SIZE       =     50    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
