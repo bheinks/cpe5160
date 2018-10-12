@@ -28,11 +28,11 @@ sbit P0_6 = P0^6;
 sbit P0_7 = P0^7;
 
 // Port 1
-sbit nCS0 = P1^0;
+sbit P1_0 = P1^0;
 sbit P1_1 = P1^1;
 sbit P1_2 = P1^2;
 sbit P1_3 = P1^3;
-sbit P1_4 = P1^4;
+sbit nCS0 = P1^4;
 sbit P1_5 = P1^5;
 sbit P1_6 = P1^6;
 sbit P1_7 = P1^7;
