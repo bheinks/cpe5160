@@ -1,0 +1,81 @@
+C51 COMPILER V9.53.0.0   UART                                                              10/12/2018 14:45:20 PAGE 1   
+
+
+C51 COMPILER V9.53.0.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN UART.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE UART.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "main.h"
+   2          #include "uart.h"
+   3          
+   4          void UART_init(uint16_t baud_rate) {
+   5   1          // configure UART
+   6   1          PCON &= 0x3F; // clear SMOD0 and SMOD1
+   7   1          PCON |= (SMOD1 << 7); // set or clear SMOD1
+   8   1      
+   9   1          SCON = UART_MODE_1 | RECEIVE_ENABLE;
+  10   1      
+  11   1          // initialize baud rate generator
+  12   1          BDRCON = 0; // disable baud rate generator
+  13   1          // set the baud rate reload
+  14   1          BRL = (uint8_t)(256 - ((1 + (5 * SPD)) * (1 + (1 * SMOD1)) * OSC_FREQ) / (32UL * OSC_PER_INST * baud_r
+             -ate));
+  15   1          // enable baud rate generator for RxD and TxD
+  16   1          BDRCON = (0x1C | (SPD << 1));
+  17   1      
+  18   1          // disable serial interrupt
+  19   1          ES = 0;
+  20   1      
+  21   1          // initially not busy
+  22   1          TI = 1;
+  23   1      }
+  24          
+  25          uint8_t UART_transmit(uint8_t send_value) {
+  26   1          uint8_t return_value;
+  27   1          uint16_t timeout;
+  28   1      
+  29   1          timeout = 0;
+  30   1      
+  31   1          do {
+  32   2              timeout++;
+  33   2          } while ((TI == 0) && (timeout != 0));
+  34   1      
+  35   1          if (timeout != 0) {
+  36   2              SBUF = send_value;
+  37   2              return_value = send_value;
+  38   2              TI = 0;
+  39   2          }
+  40   1          else {
+  41   2              return_value = UART_TIMEOUT;
+  42   2          }
+  43   1      
+  44   1          return return_value;
+  45   1      }
+  46          
+  47          uint8_t UART_receive(void) {
+  48   1          uint8_t rec_value;
+  49   1          
+  50   1          while (RI == 0);
+  51   1          rec_value = SBUF;
+  52   1          RI = 0;
+  53   1          
+  54   1          return rec_value;
+C51 COMPILER V9.53.0.0   UART                                                              10/12/2018 14:45:20 PAGE 2   
+
+  55   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     89    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
