@@ -41,29 +41,25 @@ void main(void) {
     delay(300);
     
 	// Initialize SPI
-    if((status = SPI_master_init(400000)) != 0) {
-        red = 0;
-    }
-    else {
-        green = 0;
-    }
+    SPI_master_init(400000);
     
    // Initialize SD card
    printf("SD Card Initialization ... \n\r");
    status = SD_card_init();
-   if(status !=  no_errors)
+   if(status !=  NO_ERROR)
    {
       green = 0;
       while(1);
    }
+   else{ //pause program to allow error message to be read
+       while(1);
+   }
+           
 	
 	// Initialize LCD
     LCD_init();
     LCD_print(LINE1, 0, line1_string);
     LCD_print(LINE2, 0, line2_string);
 
-	while(1) {
-        printf("status: %2.2X", status);
-        delay(1000);
+
     }
-}

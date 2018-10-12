@@ -1,5 +1,7 @@
 #include "SD.h"
 #include "SPI.h"
+#include "STDIO.H"
+#include "PORT.h"
 
 sbit green = P2^7;
 sbit orange = P2^6;
@@ -130,7 +132,7 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
 }
 
 uint8_t SD_card_init(void) {
-    uint8_t index, return_value, receive_array[8], error_flag, error_status, timeout;
+    uint8_t index, receive_array[8], error_flag, timeout, return_value;
 
     timeout = 0; //initialize timeout variable
     
@@ -149,46 +151,44 @@ uint8_t SD_card_init(void) {
     *************/
     
     green = 0;
-    printf("CMD0 sent...\n");
+    
     
     nCS0 = 0;
     
     //check for error
     if(error_flag != NO_ERROR){
-        return_value = SD_INIT_ERROR;
-        return return_value;
+        printf("SCK init error\n");
+        return SD_INIT_ERROR;
     }
     
     //send CMD0 to SD card
+    printf("CMD0 sent...\n");
     error_flag = send_command(CMD0, 0);
     
     //check for error
     if(error_flag != NO_ERROR){
-        return_value = SD_INIT_ERROR;
-        return return_value;
+        printf("CMD0 send error\n");
+        return SD_INIT_ERROR;
     }
     
-    //recieve response from SD card
-    error_flag=recieve_response(1, recieve_array);
+    //receive response from SD card
+    error_flag=receive_response(1, receive_array);
     nCS0 = 1;
     
     if(error_flag != NO_ERROR){
-        error_status = error_flag;
-        return_value = SD_INIT_ERROR;
-        return return_value;
+        printf("CMD0 receive error\n");
+        return SD_INIT_ERROR;
     }
-    else if(rec_array[0] != 0x01){
-        error_status = response_error;
-        return_value = SD_INIT_ERROR;
-        printf(error_status);
-        printf("Response recieved: 0x");
-        printf("%2.2Bx", recieve_array[0]);
+    else if(receive_array[0] != 0x01){
+        printf("response error");
+        printf("Response received: 0x");
+        printf("%2.2Bx", receive_array[0]);
         printf("...\n");
-        return return_value;
+        return SD_INIT_ERROR;
     }
     
-    printf("Response recieved: 0x");
-    printf("%2.2Bx", recieve_array[0]);
+    printf("Response received: 0x");
+    printf("%2.2Bx", receive_array[0]);
     printf("...\n");
     
     /************
@@ -203,30 +203,27 @@ uint8_t SD_card_init(void) {
     
     //check for error
     if(error_flag != NO_ERROR){
-        return_value = SD_INIT_ERROR;
-        return return_value;
+        printf("CMD8 send error\n");
+        return SD_INIT_ERROR;
     }
     
-    //recieve response from SD card
-    error_flag=recieve_response(5, recieve_array);
+    //receive response from SD card
+    error_flag=receive_response(5, receive_array);
     nCS0 = 1;
     
-    if(recieve_array[0] == 0x05){
-        error_status = VERSION_1;
-        printf("Version 1 SD Card is Not Supported \n);
-        return return_value;
+    if(receive_array[0] == 0x05){
+        printf("Version 1 SD Card is Not Supported\n");
+        return SD_INIT_ERROR;
     }
-    else if(rec_array[0] != 0x01){
-        error_status = response_error;
-        return_value = SD_INIT_ERROR;
-        printf(error_status);
-        printf("Response recieved: 0x");
-        printf("%2.2Bx", recieve_array[0]);
+    else if(receive_array[0] != 0x01){
+        printf("Version 2 Card Detected\n");
+        printf("Response received: 0x");
+        printf("%2.2Bx", receive_array[0]);
         printf("...\n");
-        return return_value;
     }
-    
-    printf("Response recieved: 0x");
-    printf("%2.2Bx", recieve_array[0]);
-    printf("...\n");
+    else{
+        printf("CMD8 receive error\n");
+        return SD_INIT_ERROR;
+    }
+    return NO_ERROR;
 }
