@@ -60,7 +60,6 @@ uint8_t SPI_transfer(uint8_t send_value, uint8_t * rec_value) {
     else {
         error_flag = NO_ERROR;
         *rec_value = SPDAT;
-        printf("(SPI_transfer) NO_ERROR\n");
     }
     
     return error_flag;
