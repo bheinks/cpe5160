@@ -1,6 +1,6 @@
 #include "SD.h"
 #include "SPI.h"
-#include "STDIO.H"
+#include <"STDIO.H"
 #include "PORT.h"
 
 sbit green = P2^7;
@@ -92,8 +92,9 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
     {
         error_flag = SPI_transfer(0xFF, &SPI_val);
         count++;
+        green = 0;
     }while(((SPI_val&0x80) == 0x80) && (error_flag == NO_ERROR) && (count != 0));
-	 
+        green = 1;
 	// Error handling
     if (error_flag != NO_ERROR)
     {
@@ -169,7 +170,7 @@ uint8_t SD_card_init(void) {
     printf("CMD0 sent...\n");
     nCS0 = 0;
     error_flag = send_command(CMD0, 0);
-    
+    orange = 0;
     //check for error
     if(error_flag != NO_ERROR){
         error_message = SEND_ERROR;
@@ -178,7 +179,7 @@ uint8_t SD_card_init(void) {
     //receive response from SD card
     error_flag=receive_response(1, receive_array);
     nCS0 = 1;
-    
+    yellow = 0;
     printf("R1 Response expected\n");
     if(error_flag != NO_ERROR){
         if(error_message == SEND_ERROR){
@@ -200,7 +201,7 @@ uint8_t SD_card_init(void) {
     printf("Response received: 0x");
     printf("%2.2Bx", receive_array[0]);
     printf("...\n");
-    
+    green = 0;
     /************
     *
     *  command 8

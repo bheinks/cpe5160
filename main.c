@@ -48,7 +48,7 @@ void main(void) {
    // Initialize SD card
    printf("SD Card Initialization ... \n\r");
    status = SD_card_init();
-   if(status !=  NO_ERROR)
+   if(status ==  NO_ERROR)
    {
       green = 0;
    }
