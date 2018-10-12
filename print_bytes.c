@@ -28,10 +28,10 @@ void print_16bytes(uint8_t * array_in)
    { 
       dat=*(input+index);
       if (dat<32 || dat>127) dat=46;
-      UART_Transmit(dat);
+      UART_transmit(dat);
    }
-   UART_Transmit(CR);
-   UART_Transmit(LF);
+   UART_transmit(CR);
+   UART_transmit(LF);
 }
 
 

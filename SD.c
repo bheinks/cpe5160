@@ -98,15 +98,18 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
     if (error_flag != NO_ERROR)
     {
         response = SPI_ERROR;
+        printf("SPI_ERROR\n");
     }
 	else if (count == 0)
     {
 		response = TIMEOUT_ERROR;
+        printf("TIMEOUT_ERROR\n");
     }
 	else if ((SPI_val&0xFE) != 0x00)
     {
         *byte_array = SPI_val;
         response = COMM_ERROR;
+        printf("COMM_ERROR\n");
     }
        
 	// No errors found
@@ -124,6 +127,7 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
         else
         {
           response = COMM_ERROR;
+          printf("COMM_ERROR2\n");
         }
     }
     error_flag = SPI_transfer(0xFF, &SPI_val);  // End with sending one last 0xFF out of the SPI port
@@ -132,7 +136,7 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array)
 }
 
 uint8_t SD_card_init(void) {
-    uint8_t index, receive_array[8], error_flag, timeout, return_value, ACMD41_check, i;
+    uint8_t index, receive_array[8], error_flag, timeout, return_value, i;
 
     timeout = 1; //initialize timeout variable
     
@@ -272,7 +276,7 @@ uint8_t SD_card_init(void) {
     
     // Print results
     printf("R3 Response expected\n");
-    if(receive_array[2]&0xFC != 0xFC){
+    if((receive_array[2]&0xFC) != 0xFC){
         printf("CMD58 incorrect voltage error\n");
         return SD_INIT_ERROR;
     }
@@ -375,7 +379,7 @@ uint8_t SD_card_init(void) {
     
     // Print results
     printf("R3 Response expected\n");
-    if(receive_array[1]&0x80 != 0x80){
+    if((receive_array[1]&0x80) != 0x80){
         printf("CMD58 card not in active state error\n");
         return SD_INIT_ERROR;
     }
