@@ -73,7 +73,7 @@ void main(void) {
        print_memory(block_data, 512);
     }
            
-      // Initialize LCD
+// Initialize LCD
 //    LCD_init();
 //    LCD_print(LINE1, 0, line1_string);
 //    LCD_print(LINE2, 0, line2_string);
