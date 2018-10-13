@@ -179,7 +179,7 @@ uint8_t SD_card_init(void) {
             printf("CMD0 send error\n");
         }
         else{
-        printf("CMD0 receive error\n");
+            printf("CMD0 receive error\n");
         }
         return SD_INIT_ERROR;
     }
@@ -436,37 +436,43 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
 	else if (count == 0) {
 		response = TIMEOUT_ERROR;
     }
-	else if ((SPI_val & 0xFE) != 0x00) {
-        *byte_array = SPI_val;
-        response = COMM_ERROR;
-    }
     else {
-        count = 0;
-        
-        // wait for data token
-        do {
-            error_flag = SPI_transfer(0xFF, &SPI_val);
-            count++;
-        } while ((SPI_val == 0xFF) && (error_flag == NO_ERROR) && (count != 0));
-        
-        if (error_flag != NO_ERROR) {
-            response = SPI_ERROR;
-        }
-        else if (count == 0) {
-            response = TIMEOUT_ERROR;
-        }
-        else if (SPI_val == 0xFE) {
-            for (count = 0; count < num_bytes; ++count) {
-                error_flag = SPI_transfer(0xFF, &SPI_val);
-                *(byte_array + count) = SPI_val;
-            }
+        if (SPI_val == 0x00) {
+            count = 0;
+            //orange = 0;
             
-            // discard CRC
-            error_flag = SPI_transfer(0xFF, &SPI_val);
-            error_flag = SPI_transfer(0xFF, &SPI_val);
+            // wait for data token
+            do {
+                error_flag = SPI_transfer(0xFF, &SPI_val);
+                count++;
+            } while ((SPI_val == 0xFF) && (error_flag == NO_ERROR) && (count != 0));
+            
+            if (error_flag != NO_ERROR) {
+                orange = 0;
+                response = SPI_ERROR;
+            }
+            else if (count == 0) {
+                yellow = 0;
+                response = TIMEOUT_ERROR;
+            }
+            else if (SPI_val == 0xFE) {
+                red = 0;
+                for (count = 0; count < num_bytes; ++count) {
+                    error_flag = SPI_transfer(0xFF, &SPI_val);
+                    *(byte_array + count) = SPI_val;
+                }
+                
+                // discard CRC
+                error_flag = SPI_transfer(0xFF, &SPI_val);
+                error_flag = SPI_transfer(0xFF, &SPI_val);
+            }
+            else {
+                green = 0;
+                response = DATA_ERROR;
+            }
         }
         else {
-            response = DATA_ERROR;
+            response = COMM_ERROR;
         }
     }
     

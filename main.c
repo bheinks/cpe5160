@@ -22,12 +22,11 @@ sbit orange = P2^6;
 sbit yellow = P2^5;
 sbit red = P2^4;
 
-uint8_t code line1_string[] = "Line 1 test";
-uint8_t code line2_string[] = "Line 2 test";
+uint8_t xdata block_data[512];
 
 void main(void) {
     uint8_t status, block_num;
-    uint8_t block_data[8];
+    uint16_t i;
     
     AUXR = 0x0C; // make all of XRAM available
     
@@ -45,32 +44,40 @@ void main(void) {
 	// Initialize SPI at 400 KHz
     SPI_master_init(400000);
     
-   // Initialize SD card
-   printf("SD Card Initialization ... \n\r");
-   status = SD_card_init();
-   if(status ==  NO_ERROR)
-   {
-      green = 0;
-   }
-   else{ //pause program to allow error message to be read
-       while(1);
-   }
+    // Initialize SD card
+    printf("SD Card Initialization ... \n\r");
+    status = SD_card_init();
+
+    if(status ==  NO_ERROR)
+    {
+        //green = 0;
+    }
+    else{ //pause program to allow error message to be read
+        while(1);
+    }
    
-   // Set clock to 25 MHz
-   status = SPI_master_init(25000000UL);
+    // Set clock to 25 MHz
+    status = SPI_master_init(25000000UL);
    
-   // Super Loop
-   while (1)
-   {
-       // Get block number from user
-       printf("Enter block number = ");
-       block_num = (uint32_t)long_serial_input();
-     
-       // Send command and grab block
-       nCS0 = 0;
-       status = send_command(CMD17, block_num);
-       read_block(512, &block_data); 
-       print_memory(block_data, 512);
+    for(i = 0; i < 512; ++i) {
+        block_data[i] = 0xFF;
+    }
+   
+    // Super Loop
+    while (1)
+    {
+        // Get block number from user
+        printf("Enter block number = ");
+        block_num = (uint32_t)long_serial_input();
+        
+        // Send command and grab block
+        nCS0 = 0;
+        
+        status = send_command(CMD17, block_num);
+        
+        
+        read_block(512, &block_data); 
+        print_memory(block_data, 512);
     }
            
 // Initialize LCD
