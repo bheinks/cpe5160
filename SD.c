@@ -120,12 +120,13 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array) {
         else {
             response = COMM_ERROR;
             printf("COMM_ERROR\n");
+            printf("0x%2.2Bx/n", SPI_val);
+            return response;
         }
     }
     
     // End with sending one last 0xFF out of the SPI port
     error_flag = SPI_transfer(0xFF, &SPI_val);
-    
     return response;
 }
 
@@ -163,6 +164,7 @@ uint8_t SD_card_init(void) {
     printf("CMD0 sent...\n");
     nCS0 = 0;
     error_flag = send_command(CMD0, 0);
+    
     //check for error
     if(error_flag != NO_ERROR){
         error_message = SEND_ERROR;
@@ -205,8 +207,7 @@ uint8_t SD_card_init(void) {
     
     // Check for error
     if(error_flag != NO_ERROR){
-        printf("CMD8 send error\n");
-        return SD_INIT_ERROR;
+        error_message = SEND_ERROR;
     }
     
     // Receive response from SD card
@@ -215,7 +216,12 @@ uint8_t SD_card_init(void) {
     
     // Check for error
     if(error_flag != NO_ERROR){
+        if(error_message == SEND_ERROR){
+            printf("CMD8 send error\n");
+        }
+        else{
         printf("CMD8 receive error\n");
+        }
         return SD_INIT_ERROR;
     }
     // Print results
@@ -257,8 +263,7 @@ uint8_t SD_card_init(void) {
     
     // Check for error
     if(error_flag != NO_ERROR){
-        printf("CMD58 send error\n");
-        return SD_INIT_ERROR;
+        error_message = SEND_ERROR;
     }
     
     // Receive response from SD card
@@ -267,7 +272,12 @@ uint8_t SD_card_init(void) {
     
     // Check for error
     if(error_flag != NO_ERROR){
+        if(error_message == SEND_ERROR){
+            printf("CMD58 send error\n");
+        }
+        else{
         printf("CMD58 receive error\n");
+        }
         return SD_INIT_ERROR;
     }
     
@@ -291,14 +301,13 @@ uint8_t SD_card_init(void) {
     *
     *************/
         
-    nCS0 = 0;
     // Send CMD55 to SD card
+    nCS0 = 0;
     error_flag = send_command(CMD55, 0);
     
     // Check for error
     if(error_flag != NO_ERROR){
-        printf("CMD55 send error\n");
-        return SD_INIT_ERROR;
+        error_message = SEND_ERROR;
     }
     
     // Receive response from SD card
@@ -307,11 +316,17 @@ uint8_t SD_card_init(void) {
     
     // Check for error
     if(error_flag != NO_ERROR){
+        if(error_message == SEND_ERROR){
+            printf("CMD55 send error\n");
+        }
+        else{
         printf("CMD55 receive error\n");
+        }
         return SD_INIT_ERROR;
     }
-    
+    printf("0x%2.2Bx/n", receive_array[0]);
     // Sending command ACMD41 until the R1 response is 0 or a timeout occurs
+    nCS0 = 0;
     while(receive_array[0] != 0){
         
         // Send ACMD41 to SD card
@@ -338,10 +353,8 @@ uint8_t SD_card_init(void) {
             printf("ACMD41 timeout error\n");
             return SD_INIT_ERROR;
         }
-        
-        nCS0 = 1;
-        
     }
+    nCS0 = 1;
     
     // Print results
     printf("Response received: 0x");
@@ -360,8 +373,7 @@ uint8_t SD_card_init(void) {
     
     // Check for error
     if(error_flag != NO_ERROR){
-        printf("CMD58 send error\n");
-        return SD_INIT_ERROR;
+        error_message = SEND_ERROR;
     }
     
     // Receive response from SD card
@@ -370,7 +382,12 @@ uint8_t SD_card_init(void) {
     
     // Check for error
     if(error_flag != NO_ERROR){
-        printf("CMD58 receive error\n");
+        if(error_message == SEND_ERROR){
+            printf("CMD58-2 send error\n");
+        }
+        else{
+        printf("CMD58-2 receive error\n");
+        }
         return SD_INIT_ERROR;
     }
     
