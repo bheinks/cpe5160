@@ -50,7 +50,7 @@ void main(void) {
 
     if(status ==  NO_ERROR)
     {
-        //green = 0;
+        green = 0;
     }
     else{ //pause program to allow error message to be read
         while(1);

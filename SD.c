@@ -149,11 +149,6 @@ uint8_t SD_card_init(void) {
     *
     *************/
     
-
-    
-    
-    
-    
     // Check for error
     if(error_flag != NO_ERROR){
         printf("SCK init error\n");
@@ -301,6 +296,7 @@ uint8_t SD_card_init(void) {
     *  ACMD41
     *
     *************/
+    
     // Sending command CMD55 and ACMD41 until the R1 response is 0 or a timeout occurs
     printf("ACMD41 sending...\n");
     while(receive_array[0] != 0){
@@ -438,7 +434,6 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
     else {
         if (SPI_val == 0x00) {
             count = 0;
-            //orange = 0;
             
             // wait for data token
             do {
@@ -447,15 +442,12 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
             } while ((SPI_val == 0xFF) && (error_flag == NO_ERROR) && (count != 0));
             
             if (error_flag != NO_ERROR) {
-                orange = 0;
                 response = SPI_ERROR;
             }
             else if (count == 0) {
-                yellow = 0;
                 response = TIMEOUT_ERROR;
             }
             else if (SPI_val == 0xFE) {
-                red = 0;
                 for (count = 0; count < num_bytes; ++count) {
                     error_flag = SPI_transfer(0xFF, &SPI_val);
                     *(byte_array + count) = SPI_val;
@@ -466,7 +458,6 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
                 error_flag = SPI_transfer(0xFF, &SPI_val);
             }
             else {
-                green = 0;
                 response = DATA_ERROR;
             }
         }
