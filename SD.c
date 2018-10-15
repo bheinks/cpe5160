@@ -194,7 +194,6 @@ uint8_t SD_card_init(void) {
     printf("Response received: 0x");
     printf("%2.2Bx", receive_array[0]);
     printf("...\n");
-    green = 0;
     /************
     *
     *  command 8
@@ -418,8 +417,8 @@ uint8_t SD_card_init(void) {
 }
 
 uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
-    uint8_t SPI_val, count, error_flag, response;
-    
+    uint8_t SPI_val, error_flag, response;
+    uint16_t count;
     response = NO_ERROR;
     count = 0;
     
@@ -475,7 +474,7 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
             response = COMM_ERROR;
         }
     }
-    
+    printf("0x%2.2Bx\n", SPI_val);
     // return to standby state
     error_flag = SPI_transfer(0xFF, &SPI_val);
     
