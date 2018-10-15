@@ -25,8 +25,9 @@ sbit red = P2^4;
 uint8_t xdata block_data[512];
 
 void main(void) {
-    uint8_t status, block_num;
+    uint8_t status;
     uint16_t i;
+    uint32_t block_num;
     
     AUXR = 0x0C; // make all of XRAM available
     
