@@ -16,6 +16,7 @@
 
 #define UART_TIMEOUT 0xF1
 
+// function prototypes
 void UART_init(uint16_t BAUD_RATE);
 uint8_t UART_transmit(uint8_t send_value);
 uint8_t UART_receive(void);

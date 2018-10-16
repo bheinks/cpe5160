@@ -9,7 +9,7 @@ uint8_t SPI_master_init(uint32_t clock_freq) {
     
     // set SPCON depending on divider value
     if (divider < 2) {
-        SPCON = 0x70 | (CPOL << 3) | (CPHA << 2);
+        SPCON = 0x70 | (CPOL << 3) | (CPHA << 2); 
     }
     else if (divider < 4) {
         SPCON = 0x71 | (CPOL << 3) | (CPHA << 2);
@@ -51,12 +51,10 @@ uint8_t SPI_transfer(uint8_t send_value, uint8_t * rec_value) {
     if (timeout == 0) {
         error_flag = TIMEOUT_ERROR;
         *rec_value = 0xFF;
-        printf("(SPI_transfer) TIMEOUT_ERROR\n");
     }
     else if ((status & 0x70) != 0) {
         error_flag = SPI_ERROR;
         *rec_value = 0xFF;
-        printf("(SPI_transfer) SPI_ERROR\n");
     }
     else {
         error_flag = NO_ERROR;

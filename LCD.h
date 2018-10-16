@@ -47,6 +47,7 @@
 #define RETURN_HOME 0x02
 #define CLEAR_DISPLAY 0x01
 
+// function prototypes
 void LCD_write(bit reg_select, uint8_t lcd_data);
 void LCD_init(void);
 void LCD_print(uint8_t address, uint8_t num_bytes, uint8_t * string_p);

@@ -3,6 +3,7 @@
 
 #include "main.h"
 
+// error codes
 #define ILLEGAL_COMMAND 0xE0
 #define SD_INIT_ERROR 0xE1
 #define COMM_ERROR 0xE3
@@ -18,6 +19,7 @@
 #define CMD58 58
 #define ACMD41 41
 
+// function prototypes
 uint8_t send_command(uint8_t command, uint32_t argument);
 uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array);
 uint8_t SD_card_init(void);

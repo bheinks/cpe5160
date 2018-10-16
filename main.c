@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+// local includes
 #include "main.h"
 #include "PORT.h"
 #include "UART.h"
@@ -17,11 +18,13 @@
 #include "SD.h"
 #include "print_bytes.h"
 
+// LEDs
 sbit green = P2^7;
 sbit orange = P2^6;
 sbit yellow = P2^5;
 sbit red = P2^4;
 
+// SD card data block
 uint8_t xdata block_data[512];
 
 void main(void) {
@@ -49,40 +52,32 @@ void main(void) {
     printf("SD Card Initialization ... \n\r");
     status = SD_card_init();
 
-    if(status ==  NO_ERROR)
-    {
+    if(status ==  NO_ERROR) {
         green = 0;
     }
-    else{ //pause program to allow error message to be read
+    else { // pause program to allow error message to be read
         while(1);
     }
    
-    // Set clock to 25 MHz
-    status = SPI_master_init(25000000UL);
+    // Set SPI clock to 25 MHz
+    SPI_master_init(25000000UL);
    
+    // initialize SD data block array
     for(i = 0; i < 512; ++i) {
         block_data[i] = 0xFF;
     }
    
     // Super Loop
-    while (1)
-    {
+    while (1) {
         // Get block number from user
         printf("Enter block number = ");
-        block_num = (uint32_t)long_serial_input();
+        block_num = long_serial_input();
         
         // Send command and grab block
         nCS0 = 0;
-        
         status = send_command(CMD17, block_num);
-        
         
         read_block(512, &block_data); 
         print_memory(block_data, 512);
     }
-           
-// Initialize LCD
-//    LCD_init();
-//    LCD_print(LINE1, 0, line1_string);
-//    LCD_print(LINE2, 0, line2_string);
 }

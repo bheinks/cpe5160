@@ -10,8 +10,10 @@ void UART_init(uint16_t baud_rate) {
 
     // initialize baud rate generator
     BDRCON = 0; // disable baud rate generator
+    
     // set the baud rate reload
     BRL = (uint8_t)(256 - ((1 + (5 * SPD)) * (1 + (1 * SMOD1)) * OSC_FREQ) / (32UL * OSC_PER_INST * baud_rate));
+    
     // enable baud rate generator for RxD and TxD
     BDRCON = (0x1C | (SPD << 1));
 

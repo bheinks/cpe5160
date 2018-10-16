@@ -9,7 +9,7 @@ void delay(uint16_t duration) {
     ET0 = 0; // no interrupts
 
     do {
-        // values for 1ms delay_1
+        // values for 1ms delay
         TH0 = TIMER_RELOAD_THx;
         TL0 = TIMER_RELOAD_TLx;
 
