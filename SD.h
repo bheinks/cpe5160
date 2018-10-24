@@ -21,7 +21,7 @@
 
 // function prototypes
 uint8_t send_command(uint8_t command, uint32_t argument);
-uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array);
+uint8_t receive_response(uint8_t num_bytes, uint8_t * byte_array);
 uint8_t SD_card_init(void);
 uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array);
 
