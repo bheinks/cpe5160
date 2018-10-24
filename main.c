@@ -17,6 +17,7 @@
 #include "Long_Serial_In.h"
 #include "SD.h"
 #include "print_bytes.h"
+#include "I2C.h"
 
 // LEDs
 sbit green = P2^7;
@@ -28,7 +29,7 @@ sbit red = P2^4;
 uint8_t xdata block_data[512];
 
 void main(void) {
-    uint8_t status;
+    uint8_t status, error, byte_array[1];
     uint16_t i;
     uint32_t block_num;
     
@@ -45,6 +46,16 @@ void main(void) {
 	UART_init(9600);
     delay(300);
     
+    green = 0;
+    
+    i = 0;
+    do {
+        error = I2C_read(0x43, 0x01, 1, 1, byte_array);
+        i++;
+    } while ((error != 0) && (i != 0));
+    printf("Received Value = %2.2bX\n\r", byte_array[0]);
+    
+    /*
 	// Initialize SPI at 400 KHz
     SPI_master_init(400000);
     
@@ -79,5 +90,7 @@ void main(void) {
         
         read_block(512, &block_data); 
         print_memory(block_data, 512);
-    }
+    }*/
+    
+    while (1);
 }

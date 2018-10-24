@@ -3,7 +3,6 @@
 
 #include "main.h"
 
-#define NO_ERROR 0
 #define BUS_BUSY_ERROR 0x81
 #define NACK_ERROR 0x82
 
