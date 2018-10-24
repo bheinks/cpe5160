@@ -61,7 +61,7 @@ uint8_t I2C_acknowledge(void) {
     return NO_ERROR;
 }
 
-uint8_t I2C_write(uint8_t device_addr, uint32_t int_addr, uint8_t int_addr_sz, uint8_t num_bytes, uint8_t * byte_array) {
+uint8_t I2C_write(uint8_t device_addr, uint16_t int_addr, uint8_t int_addr_sz, uint8_t num_bytes, uint8_t * byte_array) {
     uint8_t i;
     
     // start condition begin
@@ -151,7 +151,7 @@ uint8_t I2C_receive_byte(void) {
     return receive_value;
 }
 
-uint8_t I2C_read(uint8_t device_addr, uint32_t int_addr, uint8_t int_addr_sz, uint8_t num_bytes, uint8_t * byte_array) {
+uint8_t I2C_read(uint8_t device_addr, uint16_t int_addr, uint8_t int_addr_sz, uint8_t num_bytes, uint8_t * byte_array) {
     uint8_t return_value, i, send_bit;
     
     // if an internal address is passed, send it via I2C_write
