@@ -12,11 +12,11 @@
 #include "PORT.h"
 #include "UART.h"
 #include "delay.h"
-#include "LCD.h"
-#include "SPI.h"
+//#include "LCD.h"
+//#include "SPI.h"
 //#include "Long_Serial_In.h"
-#include "SD.h"
-#include "print_bytes.h"
+//#include "SD.h"
+//#include "print_bytes.h"
 #include "I2C.h"
 
 // LEDs
@@ -46,14 +46,13 @@ void main(void) {
 	UART_init(9600);
     delay(300);
     
-    green = 0;
-    
     i = 0;
     do {
         error = I2C_read(0x43, 0x01, 1, 1, byte_array);
         i++;
     } while ((error != 0) && (i != 0));
     printf("Received Value = %2.2bX\n\r", byte_array[0]);
+    printf("Return value = %2.2bX\n\r", error);
     
     /*
 	// Initialize SPI at 400 KHz
