@@ -2,6 +2,7 @@
 #include "STA013.h"
 #include "I2C.h"
 #include "PORT.h"
+#include "delay.h"
 
 uint8_t STA013_config(uint8_t * config_array);
 
@@ -13,10 +14,14 @@ sbit red = P2^4;
 // import labels
 extern uint8_t code CONFIG;
 extern uint8_t code CONFIG2;
+extern uint8_t code CONFIG3;
 
 uint8_t STA013_init(void) {
     STA013_config(&CONFIG);
+    delay(1);
     STA013_config(&CONFIG2);
+    delay(1);
+    STA013_config(&CONFIG3);
     
     return 0;
 }

@@ -47,7 +47,7 @@ void main(void) {
 	UART_init(9600);
     delay(300);
     
-    STA013_init();
+    //STA013_init();
     
     while(btn != 0);
     green = 0;
@@ -57,6 +57,7 @@ void main(void) {
         error = I2C_read(0x43, 0x01, 1, 1, byte_array);
         i++;
     } while ((error != 0) && (i != 0));
+    printf("Received value: %2.2bX\n", byte_array[0]);
     
     green = 1;
     while (1);
