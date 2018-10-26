@@ -31,7 +31,7 @@ uint8_t xdata block_data[512];
 void main(void) {
     uint8_t status, error, byte_array[1];
     uint16_t i;
-    uint32_t block_num;
+    //uint32_t block_num;
     
     AUXR = 0x0C; // make all of XRAM available
     
@@ -51,8 +51,6 @@ void main(void) {
         error = I2C_read(0x43, 0x01, 1, 1, byte_array);
         i++;
     } while ((error != 0) && (i != 0));
-    printf("Received Value = %2.2bX\n\r", byte_array[0]);
-    printf("Return value = %2.2bX\n\r", error);
     
     /*
 	// Initialize SPI at 400 KHz

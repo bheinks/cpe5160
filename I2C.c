@@ -24,51 +24,25 @@ sbit red = P2^4;
 uint8_t I2C_send_byte(uint8_t send_value) {
     uint8_t num_bits, send_bit, sent_bit;
     
-    /*num_bits = 7;
-    printf("%2.2bX\n", num_bits);
-    num_bits--;
-    printf("%2.2bX\n", num_bits);
-    num_bits--;
-    printf("%2.2bX\n", num_bits);
-    num_bits--;
-    printf("%2.2bX\n", num_bits);
-    num_bits--;
-    printf("%2.2bX\n", num_bits);
-    num_bits--;
-    printf("%2.2bX\n", num_bits);
-    num_bits--;
-    printf("%2.2bX\n", num_bits);
-    num_bits--;
-    printf("%2.2bX\n", num_bits);*/
-    
     // send bits starting with MSB
-    for (num_bits = 7; num_bits > 0; num_bits--) {
-        
-        printf("%2.2bX\n", num_bits);
+    for (num_bits = 8; num_bits > 0; num_bits--) {
         I2C_clock_delay(CONTINUE);
         SCL = 0;
         
-        send_bit = (send_value >> num_bits) & 0x01;
+        send_bit = (send_value >> (num_bits-1)) & 0x01;
         SDA = (bit)send_bit;
         
         I2C_clock_delay(CONTINUE);
         
         SCL = 1;
-        green = 0;
         while (SCL != 1);
-        orange = 0;
         
         sent_bit = SDA;
         if (sent_bit != send_bit) {
-            yellow = 0;
-            //printf("send_bit = %2.2bX\n\r", send_bit);
-            //printf("sent_bit = %2.2bX\n\r", sent_bit);
             return BUS_BUSY_ERROR;
         }
-        red = 0;
-        //printf("%d\n", num_bits);
     }
-    yellow = 0;
+    
     return NO_ERROR;
 }
 
@@ -133,7 +107,6 @@ uint8_t I2C_write(uint8_t device_addr, uint16_t int_addr, uint8_t int_addr_sz, u
         // send data
         for (i = 0; i < num_bytes; ++i) {
             if (I2C_send_byte(byte_array[i]) != NO_ERROR) {
-                orange = 0;
                 return BUS_BUSY_ERROR;
             }
             
@@ -158,7 +131,6 @@ uint8_t I2C_write(uint8_t device_addr, uint16_t int_addr, uint8_t int_addr_sz, u
         // stop condition end
     }
     else {
-        yellow = 0;
         return BUS_BUSY_ERROR;
     }
     
@@ -166,10 +138,10 @@ uint8_t I2C_write(uint8_t device_addr, uint16_t int_addr, uint8_t int_addr_sz, u
 }
 
 uint8_t I2C_receive_byte(void) {
-    uint8_t num_bits, receive_value, sent_bit;
+    uint8_t i, receive_value, sent_bit;
     receive_value = 0;
     
-    for (num_bits = 7; num_bits >= 0; ++num_bits) {
+    for (i = 0; i < 8; ++i) {
         I2C_clock_delay(CONTINUE);
         
         SCL = 0;
@@ -212,7 +184,6 @@ uint8_t I2C_read(uint8_t device_addr, uint16_t int_addr, uint8_t int_addr_sz, ui
 
         // send device address with LSB 1 for r/w
         if (I2C_send_byte((device_addr << 1) | 0x01) != NO_ERROR) {
-            red = 0;
             return BUS_BUSY_ERROR;
         }
         
