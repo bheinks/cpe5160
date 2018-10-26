@@ -1,11 +1,7 @@
-
 PUBLIC CONFIG, CONFIG2
-
 
 STA013_config SEGMENT CODE
         RSEG STA013_config
-
-
 
 CONFIG:
 DB 58, 1
@@ -2034,6 +2030,5 @@ DB 5, 161
 DB 24, 4
 DB 0xff, 0xff
 DB 0xff, 0xff
-
 
 END
