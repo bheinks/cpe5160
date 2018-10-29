@@ -10,8 +10,8 @@ void delay(uint16_t duration) {
 
     do {
         // values for 1ms delay
-        TH0 = TIMER_RELOAD_THx;
-        TL0 = TIMER_RELOAD_TLx;
+        TH0 = TIMER_RELOAD_H;
+        TL0 = TIMER_RELOAD_L;
 
         TF0 = 0; // clear overflow flag
         TR0 = 1; // start timer 0
