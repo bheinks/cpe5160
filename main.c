@@ -27,11 +27,10 @@ sbit yellow = P2^5;
 sbit red = P2^4;
 sbit btn = P2^3;
 
-SD card data block
+// SD card data block
 uint8_t xdata block_data[512];
 
 void main(void) {
-    uint8_t error, byte_array[1], y;
     uint8_t status;
     uint16_t i;
     uint32_t block_num;
@@ -84,19 +83,6 @@ void main(void) {
         read_block(512, &block_data); 
         print_memory(block_data, 512);
     }
-    
-    // initialize STA013
-    STA013_init();
-    
-    // wait for button
-    while(btn != 0);
-    
-    y = 0;
-    do {
-        error = I2C_read(0x43, 0x54, 1, 1, byte_array);
-        y++;
-    } while ((error != 0) && (y != 0));
-    printf("Received value: %2.2bX\n", byte_array[0]);
     
     while (1);
 }
