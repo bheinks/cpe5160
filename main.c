@@ -27,7 +27,7 @@ sbit yellow = P2^5;
 sbit red = P2^4;
 sbit btn = P2^3;
 
-SD card data block
+// SD card data block
 uint8_t xdata block_data[512];
 
 void main(void) {
