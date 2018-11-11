@@ -3,6 +3,7 @@
 // local includes
 #include "FAT.h"
 #include "PORT.h"
+#include "read_sector.h"
 
 
 // LEDs
@@ -57,7 +58,7 @@ uint8_t mount_drive(void) {
     uint8_t error = NO_ERROR;
     uint8_t xdata block_data[512];
     
-    read_sector(0, 512, &block_data);
+    read_sector(8192, 512, &block_data);
     
     printf("First byte: %2.2bX", block_data[0]);
     

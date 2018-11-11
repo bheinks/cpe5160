@@ -19,6 +19,7 @@
 #include "print_bytes.h"
 #include "I2C.h"
 #include "STA013.h"
+#include "FAT.h"
 
 // LEDs
 sbit green = P2^7;
@@ -62,7 +63,9 @@ void main(void) {
    
     // Set SPI clock to 25 MHz
     SPI_master_init(25000000UL);
-   
+    
+    mount_drive();
+
     // initialize SD data block array
     /*for(i = 0; i < 512; ++i) {
         block_data[i] = 0xFF;
