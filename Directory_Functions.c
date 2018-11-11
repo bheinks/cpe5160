@@ -34,8 +34,8 @@ CAUTION: Supports FAT16, SD_shift must be set before using this function
 
 uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 { 
-   uint32_t Sector, max_sectors;
-   uint16_t i, entries;
+   uint32_t idata Sector, max_sectors;
+   uint16_t idata i, entries;
    uint8_t temp8, j, attr, out_val, error_flag;
    uint8_t * values;
 
@@ -139,7 +139,7 @@ CAUTION:
 uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in)
 { 
    uint32_t idata Sector, max_sectors, return_clus;
-   uint16_t i, entries;
+   uint16_t idata i, entries;
    uint8_t temp8, attr, error_flag;
    uint8_t * values;
 

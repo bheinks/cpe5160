@@ -1,5 +1,5 @@
 /*
-	CpE 5160 Experiment 3
+	CpE 5160 Experiment 4
 	Brett Heinkel
 	Michael Proemsey
 	Ian Piskulic
@@ -28,12 +28,10 @@ sbit red = P2^4;
 sbit btn = P2^3;
 
 // SD card data block
-uint8_t xdata block_data[512];
+//uint8_t xdata block_data[512];
 
 void main(void) {
     uint8_t status;
-    uint16_t i;
-    uint32_t block_num;
     
     AUXR = 0x0C; // Make all of XRAM available
     
@@ -66,7 +64,7 @@ void main(void) {
     SPI_master_init(25000000UL);
    
     // initialize SD data block array
-    for(i = 0; i < 512; ++i) {
+    /*for(i = 0; i < 512; ++i) {
         block_data[i] = 0xFF;
     }
    
@@ -82,7 +80,7 @@ void main(void) {
         
         read_block(512, &block_data); 
         print_memory(block_data, 512);
-    }
+    }*/
     
     while (1);
 }
