@@ -19,7 +19,7 @@
 
 //uint16 read16(uint16 offset, uint8 * array_name);
 
-//uint32 read32(uint16 offset, uint8 * array_name);
+//uint32 read(uint16 offset, uint8 * array_name);
 
 //uint8 Mount_Drive(uint8 xdata * array_name);
 
