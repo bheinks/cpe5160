@@ -3,6 +3,9 @@
 
 #include "main.h"
 
+// error codes
+#define BPB_NOT_FOUND 0xE9
+
 // Function prototypes
 uint8_t read8 (uint16_t offset, uint8_t * array_name); 
 uint16_t read16 (uint16_t offset, uint8_t * array_name); 
