@@ -4,6 +4,7 @@
 #include "SD.h"
 #include "SPI.h"
 #include "PORT.h"
+#include "delay.h"
 
 // LEDs
 sbit green = P2^7;
@@ -428,12 +429,12 @@ uint8_t SD_card_init(void) {
 }
 
 uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
-    uint8_t SPI_val, error_flag, response;
-    uint16_t count;
-    response = NO_ERROR;
+    uint8_t SPI_val, error_flag;
+    uint16_t idata count;
+    error_flag = NO_ERROR;
     count = 0;
     
-    // keep transmitting until a response is received or timeout occurs
+    // keep transmitting until a error_flag is received or timeout occurs
 	do {
         error_flag = SPI_transfer(0xFF, &SPI_val);
         count++;
@@ -441,10 +442,10 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
     
     // error handling
     if (error_flag != NO_ERROR) {
-        response = SPI_ERROR;
+        error_flag = SPI_ERROR;
     }
 	else if (count == 0) {
-		response = TIMEOUT_ERROR;
+		error_flag = TIMEOUT_ERROR;
     }
     else {
         if (SPI_val == 0x00) {
@@ -457,10 +458,10 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
             } while ((SPI_val == 0xFF) && (error_flag == NO_ERROR) && (count != 0));
             
             if (error_flag != NO_ERROR) {
-                response = SPI_ERROR;
+                error_flag = SPI_ERROR;
             }
             else if (count == 0) {
-                response = TIMEOUT_ERROR;
+                error_flag = TIMEOUT_ERROR;
             }
             // if data token
             else if (SPI_val == 0xFE) {
@@ -474,16 +475,16 @@ uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
                 error_flag = SPI_transfer(0xFF, &SPI_val);
             }
             else {
-                response = DATA_ERROR;
+                error_flag = DATA_ERROR;
             }
         }
         else {
-            response = COMM_ERROR;
+            error_flag = COMM_ERROR;
         }
     }
     
     // return to standby state
     error_flag = SPI_transfer(0xFF, &SPI_val);
     
-    return response;
+    return error_flag;
 }
