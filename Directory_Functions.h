@@ -1,7 +1,7 @@
 #ifndef _Directory_Func_H
 #define _Directory_Func_H
 
-#include "Main.H"
+#include "main.h"
 
 //------- Public Constants  -----------------------------------------
 #define FAT32 (4)
@@ -13,15 +13,13 @@
 #define more_entries (0x8000)   
 #define no_entry_found (0x80000000)  // msb set to indicate error
 #define directory_bit  (0x10000000)  // lsb of first nibble (bit28)
+#define BPB_NOT_FOUND 0xE9
 
 // ------ Public function prototypes -------------------------------
-//uint8 read8(uint16 offset, uint8 * array_name);
 
-//uint16 read16(uint16 offset, uint8 * array_name);
+uint32_t read(uint16_t offset, uint8_t * array_name, uint8_t num_bytes);
 
-//uint32 read(uint16 offset, uint8 * array_name);
-
-//uint8 Mount_Drive(uint8 xdata * array_name);
+uint8_t mount_drive(void);
 
 //uint32 First_Sector (uint32 Cluster_num);
 
