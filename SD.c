@@ -430,7 +430,7 @@ uint8_t SD_card_init(void) {
 
 uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
     uint8_t SPI_val, error_flag;
-    uint16_t count;
+    uint16_t idata count;
     error_flag = NO_ERROR;
     count = 0;
     
