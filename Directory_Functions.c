@@ -57,10 +57,10 @@ uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
      do
      {
  
-	    temp8=read8(0+i,values);  // read first byte to see if empty
+	    temp8=read32(0+i,values, 8);  // read first byte to see if empty
         if((temp8!=0xE5)&&(temp8!=0x00))
 	    {  
-	       attr=read8(0x0b+i,values);
+	       attr=read32(0x0b+i,values, 8);
 		   	YELLOWLED=1;
 		   if((attr&0x0E)==0)   // if hidden, system or Vol_ID bit is set do not print
 		   {
@@ -68,14 +68,14 @@ uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 			  printf("%5d. ",entries);  // print entry number with a fixed width specifier
 		      for(j=0;j<8;j++)
 			  {
-			     out_val=read8(i+j,values);   // print the 8 byte name
+			     out_val=read32(i+j,values, 8);   // print the 8 byte name
 			     putchar(out_val);
 			  }
               if((attr&0x10)==0x10)  // indicates directory
 			  {
 			     for(j=8;j<11;j++)
 			     {
-			        out_val=read8(i+j,values);
+			        out_val=read32(i+j,values, 8);
 			        putchar(out_val);
 			     }
 			     printf("[DIR]\n");
@@ -85,7 +85,7 @@ uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 			     putchar(0x2E);       
 			     for(j=8;j<11;j++)
 			     {
-			        out_val=read8(i+j,values);
+			        out_val=read32(i+j,values, 8);
 			        putchar(out_val);
 			     }
 			     putchar(0x0d);
@@ -161,10 +161,10 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
    {
      do
      {
-        temp8=read8(0+i,values);  // read first byte to see if empty
+        temp8=read32(0+i,values, 8);  // read first byte to see if empty
         if((temp8!=0xE5)&&(temp8!=0x00))
 	    {  
-	       attr=read8(0x0b+i,values);
+	       attr=read32(0x0b+i,values, 8);
 		   if((attr&0x0E)==0)    // if hidden do not print
 		   {
 		      entries++;
@@ -172,16 +172,16 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
               {
 			    if(FATtype_g==FAT32)
                 {
-                   return_clus=read8(21+i,values);
+                   return_clus=read32(21+i,values, 8);
 				   return_clus&=0x0F;            // makes sure upper four bits are clear
 				   return_clus=return_clus<<8;
-                   return_clus|=read8(20+i,values);
+                   return_clus|=read32(20+i,values, 8);
                    return_clus=return_clus<<8;
                 }
-                return_clus|=read8(27+i,values);
+                return_clus|=read32(27+i,values, 8);
 			    return_clus=return_clus<<8;
-                return_clus|=read8(26+i,values);
-			    attr=read8(0x0b+i,values);
+                return_clus|=read32(26+i,values, 8);
+			    attr=read32(0x0b+i,values, 8);
 			    if(attr&0x10) return_clus|=directory_bit;
                 temp8=0;    // forces a function exit
               }
