@@ -49,8 +49,9 @@ uint8_t mount_drive(void) {
     
     return NO_ERROR;
 }
-
-
+uint32_t First_Sector (uint32_t Cluster_Num){
+    
+}
 
 /***********************************************************************
 DESC: Prints all short file name entries for a given directory 
@@ -87,10 +88,10 @@ uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
      do
      {
  
-	    temp8=read(0+i,values, 8);  // read first byte to see if empty
+	    temp8=read(0+i,values, 1);  // read first byte to see if empty
         if((temp8!=0xE5)&&(temp8!=0x00))
 	    {  
-	       attr=read(0x0b+i,values, 8);
+	       attr=read(0x0b+i,values, 1);
 		   	YELLOWLED=1;
 		   if((attr&0x0E)==0)   // if hidden, system or Vol_ID bit is set do not print
 		   {
@@ -98,14 +99,14 @@ uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 			  printf("%5d. ",entries);  // print entry number with a fixed width specifier
 		      for(j=0;j<8;j++)
 			  {
-			     out_val=read(i+j,values, 8);   // print the 8 byte name
+			     out_val=read(i+j,values, 1);   // print the 8 byte name
 			     putchar(out_val);
 			  }
               if((attr&0x10)==0x10)  // indicates directory
 			  {
 			     for(j=8;j<11;j++)
 			     {
-			        out_val=read(i+j,values, 8);
+			        out_val=read(i+j,values, 1);
 			        putchar(out_val);
 			     }
 			     printf("[DIR]\n");
@@ -115,7 +116,7 @@ uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 			     putchar(0x2E);       
 			     for(j=8;j<11;j++)
 			     {
-			        out_val=read(i+j,values, 8);
+			        out_val=read(i+j,values, 1);
 			        putchar(out_val);
 			     }
 			     putchar(0x0d);
@@ -191,10 +192,10 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
    {
      do
      {
-        temp8=read(0+i,values, 8);  // read first byte to see if empty
+        temp8=read(0+i,values, 1);  // read first byte to see if empty
         if((temp8!=0xE5)&&(temp8!=0x00))
 	    {  
-	       attr=read(0x0b+i,values, 8);
+	       attr=read(0x0b+i,values, 1);
 		   if((attr&0x0E)==0)    // if hidden do not print
 		   {
 		      entries++;
@@ -202,16 +203,16 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
               {
 			    if(FATtype_g==FAT32)
                 {
-                   return_clus=read(21+i,values, 8);
+                   return_clus=read(21+i,values, 1);
 				   return_clus&=0x0F;            // makes sure upper four bits are clear
 				   return_clus=return_clus<<8;
-                   return_clus|=read(20+i,values, 8);
+                   return_clus|=read(20+i,values, 1);
                    return_clus=return_clus<<8;
                 }
-                return_clus|=read(27+i,values, 8);
+                return_clus|=read(27+i,values, 1);
 			    return_clus=return_clus<<8;
-                return_clus|=read(26+i,values, 8);
-			    attr=read(0x0b+i,values, 8);
+                return_clus|=read(26+i,values, 1);
+			    attr=read(0x0b+i,values, 1);
 			    if(attr&0x10) return_clus|=directory_bit;
                 temp8=0;    // forces a function exit
               }
