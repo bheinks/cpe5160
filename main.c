@@ -30,7 +30,7 @@ sbit btn = P2^3;
 extern uint32_t idata FirstRootDirSec_g;
 
 // SD card data block
-uint8_t xdata block_data[512];
+uint8_t xdata block_data_g[512];
 
 void main(void) {
     uint8_t status;
@@ -75,7 +75,7 @@ void main(void) {
     // Super Loop
     while (1) {
         // list entries
-        num_entries = Print_Directory(sec_num, &block_data);
+        num_entries = Print_Directory(sec_num, &block_data_g);
         
         // Get block number from user
         printf("\nEnter selection: ");
@@ -86,7 +86,7 @@ void main(void) {
             continue;
         }
         
-        entry = Read_Dir_Entry(sec_num, entry_num, &block_data);
+        entry = Read_Dir_Entry(sec_num, entry_num, &block_data_g);
         printf("Entry: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", entry, entry << 8, entry << 16, entry << 24);
     }
     
