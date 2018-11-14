@@ -115,7 +115,7 @@ CAUTION: Supports FAT16, SD_shift must be set before using this function
 
 
 
-/*uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
+uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 { 
    uint32_t idata Sector, max_sectors;
    uint16_t idata i, entries;
@@ -171,7 +171,6 @@ CAUTION: Supports FAT16, SD_shift must be set before using this function
 			        out_val=read(i+j,values, 1);
 			        putchar(out_val);
 			     }
-			     putchar(0x0d);
                  putchar(0x0a);
 			  }
 		    }
@@ -206,7 +205,7 @@ CAUTION: Supports FAT16, SD_shift must be set before using this function
 	   entries=0;    // no entries found indicates disk read error
 	}
     return entries;
- }*/
+}
 
 
 /***********************************************************************
@@ -219,7 +218,7 @@ RETURNS: uint32_t with cluster in lower 28 bits.  Bit 28 set if this is
 CAUTION: 
 ************************************************************************/
 
-/*uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in)
+uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in)
 { 
    uint32_t idata Sector, max_sectors, return_clus;
    uint16_t idata i, entries;
@@ -299,4 +298,4 @@ CAUTION:
    }
    if(return_clus==0) return_clus=no_entry_found;
    return return_clus;
-}*/
+}

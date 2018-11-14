@@ -16,7 +16,6 @@
 #include "SPI.h"
 #include "Long_Serial_In.h"
 #include "SD.h"
-#include "print_bytes.h"
 #include "I2C.h"
 #include "STA013.h"
 #include "Directory_Functions.h"
@@ -28,11 +27,15 @@ sbit yellow = P2^5;
 sbit red = P2^4;
 sbit btn = P2^3;
 
+extern uint32_t idata FirstRootDirSec_g;
+
 // SD card data block
-//uint8_t xdata block_data[512];
+uint8_t xdata block_data[512];
 
 void main(void) {
     uint8_t status;
+    uint16_t num_entries, entry_num;
+    uint32_t entry, sec_num;
     
     AUXR = 0x0C; // Make all of XRAM available
     
@@ -45,7 +48,6 @@ void main(void) {
 	
 	// Initialize UART
 	UART_init(9600);
-    delay(300);
     
 	// Initialize SPI at 400 KHz
     SPI_master_init(400000);
@@ -64,26 +66,29 @@ void main(void) {
     // Set SPI clock to 25 MHz
     SPI_master_init(25000000UL);
     
+    // mount SD card
     mount_drive();
-
-    // initialize SD data block array
-    /*for(i = 0; i < 512; ++i) {
-        block_data[i] = 0xFF;
-    }
+    
+    // start at first root directory sector
+    sec_num = FirstRootDirSec_g;
    
     // Super Loop
     while (1) {
+        // list entries
+        num_entries = Print_Directory(sec_num, &block_data);
+        
         // Get block number from user
-        printf("Enter block number = ");
-        block_num = long_serial_input();
+        printf("\nEnter selection: ");
+        entry_num = long_serial_input();
         
-        // Send command and grab block
-        nCS0 = 0;
-        status = send_command(CMD17, block_num);
+        // if entry is greater than number of entries, prompt user again
+        if (entry_num > num_entries) {
+            continue;
+        }
         
-        read_block(512, &block_data); 
-        print_memory(block_data, 512);
-    }*/
+        entry = Read_Dir_Entry(sec_num, entry_num, &block_data);
+        printf("Entry: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", entry, entry << 8, entry << 16, entry << 24);
+    }
     
     while (1);
 }
