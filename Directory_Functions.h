@@ -14,6 +14,7 @@
 #define no_entry_found (0x80000000)  // msb set to indicate error
 #define directory_bit  (0x10000000)  // lsb of first nibble (bit28)
 #define BPB_NOT_FOUND 0xE9
+#define FS_NOT_SUPPORTED 0xE8
 
 // ------ Public function prototypes -------------------------------
 

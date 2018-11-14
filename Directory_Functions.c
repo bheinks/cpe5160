@@ -30,29 +30,74 @@ uint32_t read(uint16_t offset, uint8_t * array_name, uint8_t num_bytes){
 }
 
 uint8_t mount_drive(void) {
-    uint32_t BPB_sector = 0;
-    uint8_t xdata block_data[512];
+    uint32_t BPBSec = 0, TotalSec, FATSize, HiddenSec, RootClus, DataSec, CountofClusters;
+    uint16_t idata RsvdSecCnt, RootEntryCnt;
+    uint8_t xdata block_data[512], NumFATs;
     
+    // read sector 0 from SD
     read_sector(0, 512, &block_data);
     
+    // if starting byte isn't 0xEB or 0xE9, this is MBR
     if ((block_data[0] != 0xEB) && (block_data[0] != 0xE9)) {
-        BPB_sector = read(0x01C6, block_data, 4);
-        read_sector(BPB_sector, 512, &block_data);
+        BPBSec = read(0x01C6, block_data, 4);
+        // read sector at BPB offset
+        read_sector(BPBSec, 512, &block_data);
     }
 
     if ((block_data[0] != 0xEB) && (block_data[0] != 0xE9)) {
         return BPB_NOT_FOUND;
     }
     
-    printf("First byte: %2.2bX\n", block_data[0]);
-    
     BytesPerSec_g = read(0x0B, block_data, 2);
-    printf("BytesPerSec: 0x%2.2bX%2.2bX\n", BytesPerSec_g, BytesPerSec_g << 8);
+    SecPerClus_g = read(0x0D, block_data, 1);
+    RsvdSecCnt = read(0x0E, block_data, 2);
+    NumFATs = read(0x10, block_data, 1);
+    RootEntryCnt = read(0x11, block_data, 2);
+    
+    TotalSec = read(0x13, block_data, 2);
+    if (TotalSec == 0) { // if FAT32
+        TotalSec = read(0x20, block_data, 4);
+    }
+    
+    FATSize = read(0x16, block_data, 2);
+    if (FATSize == 0) { // if FAT32
+        FATSize = read(0x24, block_data, 4);
+    }
+    
+    HiddenSec = read(0x1C, block_data, 4);
+    RootClus = read(0x2C, block_data, 4);
+    
+    RootDirSecs_g = ((RootEntryCnt * 32) + (BytesPerSec_g - 1)) / BytesPerSec_g;
+    DataSec = TotalSec - (RsvdSecCnt + (NumFATs + FATSize) + RootDirSecs_g);
+    CountofClusters = DataSec / SecPerClus_g;
+    
+    if (CountofClusters >= 65525) {
+        FATtype_g = FAT32;
+    }
+    else { // FAT12 or FAT16
+        printf("FAT type not supported\n");
+        return FS_NOT_SUPPORTED;
+    }
+    
+    StartofFAT_g = RsvdSecCnt + HiddenSec;
+    FirstDataSec_g = RsvdSecCnt + (NumFATs * FATSize) + RootDirSecs_g + HiddenSec;
+    FirstRootDirSec_g = ((RootClus - 2) * SecPerClus_g) + FirstDataSec_g;
+    
+    /*printf("BytesPerSec: 0x%2.2bX%2.2bX\n", BytesPerSec_g, BytesPerSec_g << 8);
+    printf("SecPerClus: 0x%2.2bX\n", SecPerClus_g);
+    printf("RsvdSecCnt: 0x%2.2bX%2.2bX\n", RsvdSecCnt, RsvdSecCnt << 8);
+    printf("NumFATs: 0x%2.2bX\n", NumFATs);
+    printf("TotalSec: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", TotalSec, TotalSec << 8, TotalSec << 16, TotalSec << 24);
+    printf("FATSize: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", FATSize, FATSize << 8, FATSize << 16, FATSize << 24);
+    printf("RootClus: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", RootClus, RootClus << 8, RootClus << 16, RootClus << 24);
+    printf("StartofFAT: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", StartofFAT_g, StartofFAT_g << 8, StartofFAT_g << 16, StartofFAT_g << 24);
+    printf("FirstDataSec: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", FirstDataSec_g, FirstDataSec_g << 8, FirstDataSec_g << 16, FirstDataSec_g << 24);
+    printf("FirstRootDirSec: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", FirstRootDirSec_g, FirstRootDirSec_g << 8, FirstRootDirSec_g << 16, FirstRootDirSec_g << 24);*/
     
     return NO_ERROR;
 }
-uint32_t First_Sector (uint32_t Cluster_Num){
-    
+uint32_t First_Sector(uint32_t Cluster_Num) {
+    return 0;
 }
 
 /***********************************************************************
@@ -65,7 +110,7 @@ CAUTION: Supports FAT16, SD_shift must be set before using this function
 
 
 
-uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
+/*uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 { 
    uint32_t idata Sector, max_sectors;
    uint16_t idata i, entries;
@@ -156,7 +201,7 @@ uint16_t  Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in)
 	   entries=0;    // no entries found indicates disk read error
 	}
     return entries;
- }
+ }*/
 
 
 /***********************************************************************
@@ -169,7 +214,7 @@ RETURNS: uint32_t with cluster in lower 28 bits.  Bit 28 set if this is
 CAUTION: 
 ************************************************************************/
 
-uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in)
+/*uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in)
 { 
    uint32_t idata Sector, max_sectors, return_clus;
    uint16_t idata i, entries;
@@ -249,9 +294,4 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
    }
    if(return_clus==0) return_clus=no_entry_found;
    return return_clus;
-}
-
-
-
-
-
+}*/
