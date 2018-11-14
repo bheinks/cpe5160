@@ -304,4 +304,6 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
 
 uint32_t Find_Next_Clus(uint32_t Cluster_num, uint8_t xdata * array_name){
     read_sector(StartofFAT_g + ((Cluster_num * 4)/BytesPerSec_g), 512 , &block_data_g);
+    
+    return read((Cluster_num * 4) % BytesPerSec_g, array_name, 4) & 0x0FFFFFFF;
 }
