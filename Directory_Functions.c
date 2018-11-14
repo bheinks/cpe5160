@@ -7,7 +7,6 @@
 #include "SD.h"
 #include "Directory_Functions.h"
 #include "print_bytes.h"
-#include "FAT.h"
 #include "read_sector.h"
 
 // global variables
@@ -50,7 +49,7 @@ uint8_t mount_drive(void) {
     return NO_ERROR;
 }
 uint32_t First_Sector (uint32_t Cluster_Num){
-    
+    return (((Cluster_Num-2)*SecPerClus_g)+FirstDataSec_g);
 }
 
 /***********************************************************************
