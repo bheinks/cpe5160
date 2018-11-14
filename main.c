@@ -98,7 +98,7 @@ void main(void) {
             printf("Sector: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", sec_num, sec_num << 8, sec_num << 16, sec_num << 24);
         }
         else { // if file
-            
+            Open_File(entry & 0x0FFFFFFF, &block_data_g);
         }
     }
     

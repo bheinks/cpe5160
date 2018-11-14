@@ -30,6 +30,6 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
 
 uint32_t Find_Next_Clus(uint32_t Cluster_num, uint8_t xdata * array_name);
 
-//uint8 Open_File(uint32 Cluster, uint8 xdata * array_in);
+uint8_t Open_File(uint32_t Cluster, uint8_t xdata * array_in);
 
 #endif

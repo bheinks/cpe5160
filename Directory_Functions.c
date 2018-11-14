@@ -8,6 +8,7 @@
 #include "Directory_Functions.h"
 #include "print_bytes.h"
 #include "read_sector.h"
+#include "Long_Serial_In.h"
 
 // global variables
 uint32_t idata FirstDataSec_g, StartofFAT_g, FirstRootDirSec_g, RootDirSecs_g;
@@ -306,4 +307,31 @@ uint32_t Find_Next_Clus(uint32_t Cluster_num, uint8_t xdata * array_name){
     read_sector(StartofFAT_g + ((Cluster_num * 4)/BytesPerSec_g), 512 , &block_data_g);
     
     return read((Cluster_num * 4) % BytesPerSec_g, array_name, 4) & 0x0FFFFFFF;
+}
+
+uint8_t Open_File(uint32_t Cluster, uint8_t xdata * array_in) {
+    uint8_t i, cont;
+    uint32_t sec_num, clus_num = Cluster;
+    
+    do {
+        sec_num = First_Sector(Cluster);
+        
+        for(i = 0; i < SecPerClus_g; ++i) {
+            read_sector(sec_num, BytesPerSec_g, array_in);
+            print_memory(array_in, BytesPerSec_g);
+            sec_num++;
+            
+            printf("Continue? [Y/n] ");
+            cont = (uint8_t)long_serial_input();
+            printf("cont: %2.2bX\n", cont);
+            
+            if ((cont != 'Y') && (cont != 'y') && (cont != '\n')) {
+                return 0;
+            }
+        }
+        
+        clus_num = Find_Next_Clus(clus_num, array_in);
+    } while(1);
+    
+    return 0;
 }
