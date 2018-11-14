@@ -12,7 +12,7 @@
 // global variables
 uint32_t idata FirstDataSec_g, StartofFAT_g, FirstRootDirSec_g, RootDirSecs_g;
 uint16_t idata BytesPerSec_g;
-uint8_t idata SecPerClus_g, FATtype_g, BytesPerSecShift_g,FATshift_g;
+uint8_t idata SecPerClus_g, FATtype_g, BytesPerSecShift_g, FATshift_g;
 
 uint32_t read(uint16_t offset, uint8_t * array_name, uint8_t num_bytes){
     uint32_t idata ret = 0;
@@ -36,7 +36,7 @@ uint8_t mount_drive(void) {
     read_sector(0, 512, &block_data);
     
     if ((block_data[0] != 0xEB) && (block_data[0] != 0xE9)) {
-        BPB_sector = read(0x01C6, block_data, 32);
+        BPB_sector = read(0x01C6, block_data, 4);
         read_sector(BPB_sector, 512, &block_data);
     }
 
@@ -45,6 +45,9 @@ uint8_t mount_drive(void) {
     }
     
     printf("First byte: %2.2bX\n", block_data[0]);
+    
+    BytesPerSec_g = read(0x0B, block_data, 2);
+    printf("BytesPerSec: 0x%2.2bX%2.2bX\n", BytesPerSec_g, BytesPerSec_g << 8);
     
     return NO_ERROR;
 }
