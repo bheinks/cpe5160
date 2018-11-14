@@ -25,7 +25,6 @@ sbit green = P2^7;
 sbit orange = P2^6;
 sbit yellow = P2^5;
 sbit red = P2^4;
-sbit btn = P2^3;
 
 extern uint32_t idata FirstRootDirSec_g;
 
@@ -88,6 +87,19 @@ void main(void) {
         
         entry = Read_Dir_Entry(sec_num, entry_num, &block_data_g);
         printf("Entry: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", entry, entry << 8, entry << 16, entry << 24);
+        
+        if ((entry >> 31) == 1) { // if error bit set
+            red = 0;
+            break;
+        }
+        
+        if ((entry >> 28) == 1) { // if directory
+            sec_num = First_Sector(entry & 0x0FFFFFFF);
+            printf("Sector: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", sec_num, sec_num << 8, sec_num << 16, sec_num << 24);
+        }
+        else { // if file
+            
+        }
     }
     
     while (1);
