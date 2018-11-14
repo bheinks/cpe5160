@@ -9,6 +9,7 @@
 #include "print_bytes.h"
 #include "read_sector.h"
 #include "Long_Serial_In.h"
+#include "delay.h"
 
 // global variables
 uint32_t idata FirstDataSec_g, StartofFAT_g, FirstRootDirSec_g, RootDirSecs_g;
@@ -322,10 +323,11 @@ uint8_t Open_File(uint32_t Cluster, uint8_t xdata * array_in) {
             sec_num++;
             
             printf("Continue? [Y/n] ");
-            cont = (uint8_t)long_serial_input();
+            cont = getchar();
             printf("cont: %2.2bX\n", cont);
             
             if ((cont != 'Y') && (cont != 'y') && (cont != '\n')) {
+                delay(10);
                 return 0;
             }
         }

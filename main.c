@@ -79,6 +79,7 @@ void main(void) {
         // Get block number from user
         printf("\nEnter selection: ");
         entry_num = long_serial_input();
+        printf("entry_num: %2.2bX%2.2bX\n", entry_num, entry_num << 8);
         
         // if entry is greater than number of entries, prompt user again
         if (entry_num > num_entries) {
