@@ -1,15 +1,11 @@
-#include "AT89C51RC2.h"
 #include <stdio.h>
+
+#include "AT89C51RC2.h"
+#include "PORT.h"
 #include "main.h"
-#include "PORT.H"
-#include "UART.h"
-#include "SPI.h"
-#include "SD.h"
 #include "Directory_Functions.h"
 #include "print_bytes.h"
 #include "read_sector.h"
-#include "Long_Serial_In.h"
-#include "delay.h"
 
 // global variables
 uint32_t idata FirstDataSec_g, StartofFAT_g, FirstRootDirSec_g, RootDirSecs_g;
@@ -86,17 +82,6 @@ uint8_t mount_drive(void) {
     StartofFAT_g = RsvdSecCnt + HiddenSec;
     FirstDataSec_g = RsvdSecCnt + (NumFATs * FATSize) + RootDirSecs_g + HiddenSec;
     FirstRootDirSec_g = ((RootClus - 2) * SecPerClus_g) + FirstDataSec_g;
-    
-    /*printf("BytesPerSec: 0x%2.2bX%2.2bX\n", BytesPerSec_g, BytesPerSec_g << 8);
-    printf("SecPerClus: 0x%2.2bX\n", SecPerClus_g);
-    printf("RsvdSecCnt: 0x%2.2bX%2.2bX\n", RsvdSecCnt, RsvdSecCnt << 8);
-    printf("NumFATs: 0x%2.2bX\n", NumFATs);
-    printf("TotalSec: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", TotalSec, TotalSec << 8, TotalSec << 16, TotalSec << 24);
-    printf("FATSize: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", FATSize, FATSize << 8, FATSize << 16, FATSize << 24);
-    printf("RootClus: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", RootClus, RootClus << 8, RootClus << 16, RootClus << 24);
-    printf("StartofFAT: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", StartofFAT_g, StartofFAT_g << 8, StartofFAT_g << 16, StartofFAT_g << 24);
-    printf("FirstDataSec: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", FirstDataSec_g, FirstDataSec_g << 8, FirstDataSec_g << 16, FirstDataSec_g << 24);
-    printf("FirstRootDirSec: 0x%2.2bX%2.2bX%2.2bX%2.2bX\n", FirstRootDirSec_g, FirstRootDirSec_g << 8, FirstRootDirSec_g << 16, FirstRootDirSec_g << 24);*/
     
     return NO_ERROR;
 }
@@ -305,35 +290,34 @@ uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
 }
 
 uint32_t Find_Next_Clus(uint32_t Cluster_num, uint8_t xdata * array_name){
-    read_sector(StartofFAT_g + ((Cluster_num * 4)/BytesPerSec_g), 512 , &block_data_g);
-    
+    read_sector(StartofFAT_g + ((Cluster_num * 4) / BytesPerSec_g), 512 , &block_data_g);
     return read((Cluster_num * 4) % BytesPerSec_g, array_name, 4) & 0x0FFFFFFF;
 }
 
-uint8_t Open_File(uint32_t Cluster, uint8_t xdata * array_in) {
+void Open_File(uint32_t Cluster, uint8_t xdata * array_in) {
     uint8_t i, cont;
     uint32_t sec_num, clus_num = Cluster;
     
     do {
-        sec_num = First_Sector(Cluster);
+        sec_num = First_Sector(clus_num);
         
-        for(i = 0; i < SecPerClus_g; ++i) {
+        for(i = 60; i < SecPerClus_g; ++i) {
             read_sector(sec_num, BytesPerSec_g, array_in);
             print_memory(array_in, BytesPerSec_g);
             sec_num++;
             
-            printf("Continue? [Y/n] ");
+            printf("\nContinue? [Y/n] ");
             cont = getchar();
-            printf("cont: %2.2bX\n", cont);
             
-            if ((cont != 'Y') && (cont != 'y') && (cont != '\n')) {
-                delay(10);
-                return 0;
+            if (cont != '\n') {
+                getchar(); // consume extra newline
+                
+                if ((cont != 'Y') && (cont != 'y')) {
+                    return;
+                }
             }
         }
         
         clus_num = Find_Next_Clus(clus_num, array_in);
     } while(1);
-    
-    return 0;
 }

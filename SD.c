@@ -423,7 +423,7 @@ uint8_t SD_card_init(void) {
         return SD_INIT_ERROR;
     }
         
-    printf("Initialization of SD card complete...\n");
+    printf("Initialization of SD card complete...\n\n");
     
     return NO_ERROR;
 }
