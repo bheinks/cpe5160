@@ -1,5 +1,5 @@
 /*
-	CpE 5160 Experiment 4
+	CpE 5160 Experiment 4 (w/ long file name bonus)
 	Brett Heinkel
 	Michael Proemsey
 	Ian Piskulic
@@ -19,6 +19,8 @@
 #include "I2C.h"
 #include "STA013.h"
 #include "Directory_Functions.h"
+#include "read_sector.h"
+#include "print_bytes.h"
 
 // LEDs
 sbit green = P2^7;
@@ -74,7 +76,7 @@ void main(void) {
     // Super Loop
     while (1) {
         // list entries
-        num_entries = Print_Directory(sec_num, &block_data_g);
+        num_entries = Print_Directory(sec_num, &block_data_g);        
         
         // Get block number from user
         printf("\nEnter selection: ");
@@ -85,7 +87,7 @@ void main(void) {
             continue;
         }
         
-        entry = Read_Dir_Entry(sec_num, entry_num, &block_data_g);
+        entry = read_dir_entry(sec_num, entry_num, &block_data_g);
         
         if ((entry >> 31) == 1) { // if error bit set
             red = 0;
@@ -96,7 +98,7 @@ void main(void) {
             sec_num = First_Sector(entry & 0x0FFFFFFF);
         }
         else { // if file
-            Open_File(entry & 0x0FFFFFFF, &block_data_g);
+            open_file(entry & 0x0FFFFFFF, &block_data_g);
         }
     }
     

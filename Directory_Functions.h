@@ -26,10 +26,10 @@ uint32_t First_Sector (uint32_t Cluster_Num);
 
 uint16_t Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in);
 
-uint32_t Read_Dir_Entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in);
+uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in);
 
-uint32_t Find_Next_Clus(uint32_t Cluster_num, uint8_t xdata * array_name);
+uint32_t find_next_cluster(uint32_t Cluster_num, uint8_t xdata * array_name);
 
-void Open_File(uint32_t Cluster, uint8_t xdata * array_in);
+void open_file(uint32_t Cluster, uint8_t xdata * array_in);
 
 #endif
