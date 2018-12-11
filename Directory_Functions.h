@@ -22,9 +22,9 @@ uint32_t read(uint16_t offset, uint8_t * array_name, uint8_t num_bytes);
 
 uint8_t mount_drive(void);
 
-uint32_t First_Sector (uint32_t Cluster_Num);
+uint32_t first_sector(uint32_t Cluster_Num);
 
-uint16_t Print_Directory(uint32_t Sector_num, uint8_t xdata * array_in);
+uint16_t print_directory(uint32_t Sector_num, uint8_t xdata * array_in);
 
 uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in);
 

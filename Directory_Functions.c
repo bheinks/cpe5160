@@ -88,7 +88,7 @@ uint8_t mount_drive(void) {
     return NO_ERROR;
 }
 
-uint32_t First_Sector(uint32_t Cluster_Num) {
+uint32_t first_sector(uint32_t Cluster_Num) {
     if (Cluster_Num == 0){
         return FirstRootDirSec_g;
     }
@@ -104,7 +104,7 @@ RETURNS: uint16_t number of entries found in the directory
 CAUTION: Supports FAT16, SD_shift must be set before using this function
 ************************************************************************/
 
-uint16_t  print_directory(uint32_t Sector_num, uint8_t xdata * array_in) { 
+uint16_t print_directory(uint32_t Sector_num, uint8_t xdata * array_in) { 
     uint32_t idata Sector, max_sectors;
     uint16_t idata i = 0, entries = 0;
     uint8_t temp8, j, attr, out_val, error_flag;
@@ -347,7 +347,7 @@ void open_file(uint32_t Cluster, uint8_t xdata * array_in) {
     uint32_t sec_num, clus_num = Cluster;
     
     do {
-        sec_num = First_Sector(clus_num);
+        sec_num = first_sector(clus_num);
         
         for (i = 0; i < SecPerClus_g; ++i) {
             read_sector(sec_num, BytesPerSec_g, array_in);

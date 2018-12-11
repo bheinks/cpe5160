@@ -43,9 +43,9 @@ sbit SW2 = P2^1;
 sbit SW3 = P2^2;
 sbit SW4 = P2^3;
 sbit REDLED = P2^4;
-sbit GREENLED = P2^5;
-sbit YELLOWLED = P2^6;
-sbit AMBERLED = P2^7;
+sbit YELLOWLED = P2^5;
+sbit AMBERLED = P2^6;
+sbit GREENLED = P2^7;
 
 
 

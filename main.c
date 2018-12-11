@@ -21,23 +21,14 @@
 #include "Directory_Functions.h"
 #include "read_sector.h"
 #include "print_bytes.h"
-
-// LEDs
-sbit green = P2^7;
-sbit orange = P2^6;
-sbit yellow = P2^5;
-sbit red = P2^4;
+#include "sEOS.h"
 
 extern uint32_t idata FirstRootDirSec_g;
 
 // SD card data block
 uint8_t xdata block_data_g[512];
 
-void main(void) {
-    uint8_t status;
-    uint16_t num_entries, entry_num;
-    uint32_t entry, sec_num;
-    
+void system_init(void) {
     AUXR = 0x0C; // Make all of XRAM available
     
     if (OSC_PER_INST == 6) {
@@ -55,20 +46,24 @@ void main(void) {
     SPI_master_init(400000);
     
     // Initialize SD card
-    status = SD_card_init();
-
-    if(status ==  NO_ERROR) {
-        green = 0;
-    }
-    else { // pause program to allow error message to be read
-        while(1);
-    }
+    SD_card_init();
    
     // Set SPI clock to 25 MHz
     SPI_master_init(25000000UL);
     
     // mount SD card
     mount_drive();
+}
+
+void main(void) {
+    uint16_t num_entries, entry_num;
+    uint32_t entry, sec_num;
+    
+    // initialize system and peripherals
+    system_init();
+    
+    // initialize sEOS interrupt at 12ms
+    seos_init(12);
     
     // start at first root directory sector
     sec_num = FirstRootDirSec_g;
@@ -76,7 +71,7 @@ void main(void) {
     // Super Loop
     while (1) {
         // list entries
-        num_entries = Print_Directory(sec_num, &block_data_g);        
+        num_entries = print_directory(sec_num, &block_data_g);        
         
         // Get block number from user
         printf("\nEnter selection: ");
@@ -90,16 +85,18 @@ void main(void) {
         entry = read_dir_entry(sec_num, entry_num, &block_data_g);
         
         if ((entry >> 31) == 1) { // if error bit set
-            red = 0;
+            REDLED = 0;
             break;
         }
         
         if ((entry >> 28) == 1) { // if directory
-            sec_num = First_Sector(entry & 0x0FFFFFFF);
+            sec_num = first_sector(entry & 0x0FFFFFFF);
         }
         else { // if file
             open_file(entry & 0x0FFFFFFF, &block_data_g);
         }
+        
+        go_to_sleep();
     }
     
     while (1);
