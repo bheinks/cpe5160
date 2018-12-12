@@ -5,24 +5,20 @@
 
 // possible system states
 typedef enum {
-    MAIN_GREEN,
-    MAIN_YELLOW_CROSS,
-    MAIN_YELLOW_SIDE,
-    MAIN_RED_CROSS,
-    MAIN_RED_SIDE,
-    SIDE_BUTTON_RELEASE,
-    SIDE_RED,
-    SIDE_GREEN,
-    SIDE_YELLOW,
-    WALK,
-    NO_WALK_ON,
-    NO_WALK_OFF
+    DATA_IDLE_1,
+    DATA_SEND_1,
+    LOAD_BUFFER_1,
+    FIND_CLUSTER_1,
+    DATA_IDLE_2,
+    DATA_SEND_2,
+    LOAD_BUFFER_2,
+    FIND_CLUSTER_2
 } states_t;
 
 // struct instance representing the system state
-states_t SYSTEM_STATE = MAIN_GREEN;
-uint32_t TIMER = 0, FLASH_TIMER = 0;
+states_t SYSTEM_STATE = DATA_IDLE_1;
+uint32_t TIMER = 0, ALT_TIMER = 0;
 
-void traffic_light_isr(void);
+void play_music_isr(void);
 
 #endif
