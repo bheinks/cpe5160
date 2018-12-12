@@ -22,9 +22,13 @@
 #include "read_sector.h"
 #include "print_bytes.h"
 #include "sEOS.h"
+#include "MP3.h"
 
 extern uint32_t idata FirstRootDirSec_g, CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM;
 extern uint8_t idata SecPerClus_g;
+extern states_t SYSTEM_STATE;
+
+bit idata PLAYING;
 
 // SD card data blocks
 uint8_t xdata BUFFER_1[512];
@@ -70,14 +74,14 @@ void system_init(void) {
 }
 
 void main(void) {
-    uint16_t num_entries, entry_num;
-    uint32_t entry, sec_num;
+    uint16_t idata num_entries, entry_num;
+    uint32_t idata entry, sec_num;
     
     // initialize system and peripherals
     system_init();
     
     // initialize sEOS interrupt at 12ms
-    seos_init(12);
+    seos_init(11);
     
     // start at first root directory sector
     sec_num = FirstRootDirSec_g;
@@ -106,6 +110,7 @@ void main(void) {
         
         if ((entry >> 28) == 1) { // if directory
             sec_num = first_sector(entry & 0x0FFFFFFF);
+            continue;
         }
         else { // if file
             //Load both buffers
@@ -115,12 +120,16 @@ void main(void) {
             CURRENT_SECTOR_NUM++;
             read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_2);
             CURRENT_SECTOR_NUM++;
-            
+            PLAYING = 1;
+            BLUELED = 0;
+            SYSTEM_STATE = DATA_SEND_1;
             EA = 1; // Enable Interrupts
         }
-        
+        while(PLAYING && SW1){
         go_to_sleep();
-        while(1);
+        }
+        EA = 0;
+        BLUELED = 1;
     }
     
     while (1);

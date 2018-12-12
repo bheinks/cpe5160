@@ -31,7 +31,7 @@ uint32_t read(uint16_t offset, uint8_t * array_name, uint8_t num_bytes){
 }
 
 uint8_t mount_drive(void) {
-    uint32_t BPBSec = 0, TotalSec, FATSize, HiddenSec, RootClus, DataSec, CountofClusters;
+    uint32_t idata BPBSec = 0, TotalSec, FATSize, HiddenSec, RootClus, DataSec, CountofClusters;
     uint16_t idata RsvdSecCnt, RootEntryCnt;
     uint8_t NumFATs;
     

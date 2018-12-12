@@ -1,5 +1,5 @@
-#ifndef _TRAFFIC_LIGHT_H
-#define _TRAFFIC_LIGHT_H
+#ifndef _MP3_H
+#define _MP3_H
 
 #include "main.h"
 
@@ -14,10 +14,6 @@ typedef enum {
     LOAD_BUFFER_2,
     FIND_CLUSTER_2
 } states_t;
-
-// struct instance representing the system state
-states_t SYSTEM_STATE = DATA_SEND_1;
-uint32_t TIMER = 0, ALT_TIMER = 0;
 
 void play_music_isr(void);
 
