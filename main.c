@@ -25,8 +25,9 @@
 
 extern uint32_t idata FirstRootDirSec_g;
 
-// SD card data block
-uint8_t xdata block_data_g[512];
+// SD card data blocks
+uint8_t xdata BUFFER_1[512];
+uint8_t xdata BUFFER_2[512];
 
 void system_init(void) {
     AUXR = 0x0C; // Make all of XRAM available
@@ -60,6 +61,11 @@ void system_init(void) {
     
     // mount SD card
     mount_drive();
+    
+    // initialize timer 1
+    TMOD &= 0x0F; // clear all T1 bits (T0 left unchanged)
+    TMOD |= 0x10; // set required T1 bits (T0 left unchanged)
+    ET1 = 0; // no interrupts
 }
 
 void main(void) {
@@ -78,7 +84,7 @@ void main(void) {
     // Super Loop
     while (1) {
         // list entries
-        num_entries = print_directory(sec_num, &block_data_g);        
+        num_entries = print_directory(sec_num, &BUFFER_1);        
         
         // Get block number from user
         printf("\nEnter selection: ");
@@ -89,7 +95,7 @@ void main(void) {
             continue;
         }
         
-        entry = read_dir_entry(sec_num, entry_num, &block_data_g);
+        entry = read_dir_entry(sec_num, entry_num, &BUFFER_1);
         
         if ((entry >> 31) == 1) { // if error bit set
             REDLED = 0;
@@ -100,7 +106,7 @@ void main(void) {
             sec_num = first_sector(entry & 0x0FFFFFFF);
         }
         else { // if file
-            open_file(entry & 0x0FFFFFFF, &block_data_g);
+            open_file(entry & 0x0FFFFFFF, &BUFFER_1);
         }
         
         go_to_sleep();

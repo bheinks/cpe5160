@@ -21,8 +21,8 @@ uint8_t STA013_init(void) {
 }
 
 uint8_t STA013_config(uint8_t * config_array) {
-    uint8_t send_array[1], internal_addr, timeout, status;
-    uint16_t i = 0;
+    uint8_t idata send_array[1], internal_addr, timeout, status;
+    uint16_t idata i = 0;
     
     do {
         timeout = 50;

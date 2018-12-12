@@ -14,7 +14,7 @@ uint32_t idata FirstDataSec_g, StartofFAT_g, FirstRootDirSec_g, RootDirSecs_g;
 uint16_t idata BytesPerSec_g;
 uint8_t idata SecPerClus_g, FATtype_g, BytesPerSecShift_g, FATshift_g;
 
-extern uint8_t xdata block_data_g[512];
+extern uint8_t xdata BUFFER_1[512];
 
 uint32_t read(uint16_t offset, uint8_t * array_name, uint8_t num_bytes){
     uint32_t idata ret = 0;
@@ -37,37 +37,37 @@ uint8_t mount_drive(void) {
     uint8_t NumFATs;
     
     // read sector 0 from SD
-    read_sector(0, 512, &block_data_g);
+    read_sector(0, 512, &BUFFER_1);
     
     // if starting byte isn't 0xEB or 0xE9, this is MBR
-    if ((block_data_g[0] != 0xEB) && (block_data_g[0] != 0xE9)) {
-        BPBSec = read(0x01C6, block_data_g, 4);
+    if ((BUFFER_1[0] != 0xEB) && (BUFFER_1[0] != 0xE9)) {
+        BPBSec = read(0x01C6, BUFFER_1, 4);
         // read sector at BPB offset
-        read_sector(BPBSec, 512, &block_data_g);
+        read_sector(BPBSec, 512, &BUFFER_1);
     }
 
-    if ((block_data_g[0] != 0xEB) && (block_data_g[0] != 0xE9)) {
+    if ((BUFFER_1[0] != 0xEB) && (BUFFER_1[0] != 0xE9)) {
         return BPB_NOT_FOUND;
     }
     
-    BytesPerSec_g = read(0x0B, block_data_g, 2);
-    SecPerClus_g = read(0x0D, block_data_g, 1);
-    RsvdSecCnt = read(0x0E, block_data_g, 2);
-    NumFATs = read(0x10, block_data_g, 1);
-    RootEntryCnt = read(0x11, block_data_g, 2);
+    BytesPerSec_g = read(0x0B, BUFFER_1, 2);
+    SecPerClus_g = read(0x0D, BUFFER_1, 1);
+    RsvdSecCnt = read(0x0E, BUFFER_1, 2);
+    NumFATs = read(0x10, BUFFER_1, 1);
+    RootEntryCnt = read(0x11, BUFFER_1, 2);
     
-    TotalSec = read(0x13, block_data_g, 2);
+    TotalSec = read(0x13, BUFFER_1, 2);
     if (TotalSec == 0) { // if FAT32
-        TotalSec = read(0x20, block_data_g, 4);
+        TotalSec = read(0x20, BUFFER_1, 4);
     }
     
-    FATSize = read(0x16, block_data_g, 2);
+    FATSize = read(0x16, BUFFER_1, 2);
     if (FATSize == 0) { // if FAT32
-        FATSize = read(0x24, block_data_g, 4);
+        FATSize = read(0x24, BUFFER_1, 4);
     }
     
-    HiddenSec = read(0x1C, block_data_g, 4);
-    RootClus = read(0x2C, block_data_g, 4);
+    HiddenSec = read(0x1C, BUFFER_1, 4);
+    RootClus = read(0x2C, BUFFER_1, 4);
     
     RootDirSecs_g = ((RootEntryCnt * 32) + (BytesPerSec_g - 1)) / BytesPerSec_g;
     DataSec = TotalSec - (RsvdSecCnt + (NumFATs + FATSize) + RootDirSecs_g);
@@ -338,7 +338,7 @@ uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
 }
 
 uint32_t find_next_cluster(uint32_t Cluster_num, uint8_t xdata * array_name){
-    read_sector(StartofFAT_g + ((Cluster_num*4) / BytesPerSec_g), 512, &block_data_g);
+    read_sector(StartofFAT_g + ((Cluster_num*4) / BytesPerSec_g), 512, array_name);
     return read((Cluster_num*4) % BytesPerSec_g, array_name, 4) & 0x0FFFFFFF;
 }
 

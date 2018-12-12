@@ -16,7 +16,6 @@
 #ifndef _PORT_H
 #define _PORT_H
 
-
 // Port 0
 sbit P0_0 = P0^0;
 sbit P0_1 = P0^1;
@@ -30,7 +29,7 @@ sbit P0_7 = P0^7;
 // Port 1
 sbit SDA = P1^0;
 sbit SCL = P1^1;
-sbit P1_2 = P1^2;
+sbit DATA_REQ = P1^2;
 sbit P1_3 = P1^3;
 sbit nCS0 = P1^4;
 sbit P1_5 = P1^5;
@@ -47,8 +46,6 @@ sbit YELLOWLED = P2^5;
 sbit AMBERLED = P2^6;
 sbit GREENLED = P2^7;
 
-
-
 // Port 3
 sbit per_TxD = P3^0;
 sbit per_RxD = P3^1;
@@ -59,13 +56,8 @@ sbit P3_5 = P3^5;
 sbit RS = P3^6;
 sbit E = P3^7;
 
-
-
 #endif
 
 /*------------------------------------------------------------------*-
   ---- END OF FILE -------------------------------------------------
 -*------------------------------------------------------------------*/
-
-
-
