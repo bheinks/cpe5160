@@ -139,13 +139,14 @@ void main(void) {
                 PAUSE = 1;
             }
 
-            if ((TIME % 80) == 0) {
+            if (((3*TIME) % 250) == 0) {
                 /*
                     seconds = numSeconds % 60;
                     minutes = (numSeconds - seconds) / 60;
                 */
-                seconds = ((TIME*80) / 1000);
-                sprintf(&time_buffer, "%d:%d", (seconds - (seconds%60) / 60), (seconds % 60));
+                seconds = (3*TIME)/250;
+                
+                sprintf(&time_buffer, "%d:%d", (seconds / 60), (seconds % 60));
                 LCD_print(LINE2, 0, time_buffer);
             }
 
