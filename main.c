@@ -23,7 +23,8 @@
 #include "print_bytes.h"
 #include "sEOS.h"
 
-extern uint32_t idata FirstRootDirSec_g;
+extern uint32_t idata FirstRootDirSec_g, CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM;
+extern uint8_t idata SecPerClus_g;
 
 // SD card data blocks
 uint8_t xdata BUFFER_1[512];

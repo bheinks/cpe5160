@@ -28,8 +28,6 @@ void seos_init(uint8_t interval) {
     
     ET2 = 1; // enable timer 2 interrupt
     TR2 = 1; // start timer 2 interrupt
-    
-    EA = 1; // enable interrupts globally
 }
 
 void go_to_sleep(void) {
