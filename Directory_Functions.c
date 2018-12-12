@@ -3,8 +3,8 @@
 #include "AT89C51RC2.h"
 #include "PORT.h"
 #include "main.h"
+#include "SD.h"
 #include "Directory_Functions.h"
-#include "read_sector.h"
 
 bit print_long_name(uint16_t entry, uint8_t entry_num, uint8_t * array_in);
 
@@ -28,6 +28,25 @@ uint32_t read(uint16_t offset, uint8_t * array_name, uint8_t num_bytes){
     }
 
     return ret;
+}
+
+uint8_t read_sector(uint32_t sector_number, uint16_t sector_size, uint8_t * byte_array) {
+    uint8_t error = NO_ERROR;
+    
+    nCS0 = 0;
+    
+    error = send_command(CMD17, sector_number);
+    if (error == NO_ERROR) {
+        error = read_block(sector_size, byte_array);
+    }
+    
+    nCS0 = 1;
+    
+    if (error != NO_ERROR) {
+        error = DISK_ERROR;
+    }
+    
+    return error;
 }
 
 uint8_t mount_drive(void) {
@@ -180,7 +199,7 @@ uint16_t print_directory(uint32_t Sector_num, uint8_t xdata * array_in) {
                     i = 0;
                 }
                 else {
-                    entries = entries|more_entries;  // set msb to indicate more entries in another cluster
+                    entries = entries|MORE_ENTRIES;  // set msb to indicate more entries in another cluster
                     temp8 = 0;                       // forces a function exit
                 }
             }
@@ -257,10 +276,10 @@ RETURNS: uint32_t with cluster in lower 28 bits.  Bit 28 set if this is
 CAUTION: 
 ************************************************************************/
 
-uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in) { 
+uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * array_in, uint8_t * filename) { 
    uint32_t idata Sector, max_sectors, return_clus;
    uint16_t idata i, entries;
-   uint8_t temp8, attr, error_flag;
+   uint8_t temp8, attr, error_flag, j;
    uint8_t * values;
 
    values=array_in;
@@ -285,7 +304,12 @@ uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
 	       attr=read(0x0b+i,values, 1);
 		   if ((attr&0x0E)==0)    // if hidden do not print
 		   {
-		      entries++;
+               entries++;
+               
+               for (j = 0; j < 8; j++) {
+                    filename[j] = read(i+j, values, 1);
+               }
+               
               if (entries==Entry)
               {
 			    if (FATtype_g==FAT32)
@@ -300,7 +324,7 @@ uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
 			    return_clus=return_clus<<8;
                 return_clus|=read(26+i,values, 1);
 			    attr=read(0x0b+i,values, 1);
-			    if (attr&0x10) return_clus|=directory_bit;
+			    if (attr&0x10) return_clus |= DIRECTORY_BIT;
                 temp8=0;    // forces a function exit
               }
               
@@ -315,7 +339,7 @@ uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
               error_flag=read_sector(Sector, BytesPerSec_g, values);
 			  if (error_flag!=NO_ERROR)
 			  {
-			     return_clus=no_entry_found;
+			     return_clus = NO_ENTRY_FOUND;
                  temp8=0; 
 			  }
 			  i=0;
@@ -330,9 +354,10 @@ uint32_t read_dir_entry(uint32_t Sector_num, uint16_t Entry, uint8_t xdata * arr
    }
    else
    {
-	 return_clus=no_entry_found;
+	 return_clus = NO_ENTRY_FOUND;
    }
-   if (return_clus==0) return_clus=no_entry_found;
+   if (return_clus==0) return_clus = NO_ENTRY_FOUND;
+   
    return return_clus;
 }
 

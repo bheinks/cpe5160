@@ -19,12 +19,13 @@
 #include "I2C.h"
 #include "STA013.h"
 #include "Directory_Functions.h"
-#include "read_sector.h"
 #include "print_bytes.h"
 #include "sEOS.h"
 #include "MP3.h"
+#include "LCD.h"
 
 extern uint32_t idata FirstRootDirSec_g, CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM;
+extern uint16_t idata TIME;
 extern uint8_t idata SecPerClus_g;
 extern states_t SYSTEM_STATE;
 
@@ -48,6 +49,9 @@ void system_init(void) {
 	UART_init(9600);
     delay(300);
     
+    // initialize LCD
+    LCD_init();
+    
 	// Initialize SPI at 400 KHz
     SPI_master_init(400000);
     
@@ -57,15 +61,13 @@ void system_init(void) {
     // Set SPI clock to 25 MHz
     SPI_master_init(25000000UL);
     
-    // reset STA013
+    // mount filesystem
+    mount_drive();
+    
+    // reset and initialize STA013
     STA013_RESET = 0;
 	STA013_RESET = 1;
-    
-    // initialize STA013
     STA013_init();
-    
-    // mount SD card
-    mount_drive();
     
     // initialize timer 1
     TMOD &= 0x0F; // clear all T1 bits (T0 left unchanged)
@@ -74,6 +76,7 @@ void system_init(void) {
 }
 
 void main(void) {
+    uint8_t idata time_buffer[8], filename[8], seconds;
     uint16_t idata num_entries, entry_num;
     uint32_t idata entry, sec_num;
     
@@ -81,14 +84,13 @@ void main(void) {
     system_init();
     
     // initialize sEOS interrupt at 12ms
-    seos_init(11);
+    sEOS_init(12);
     
     // start at first root directory sector
     sec_num = FirstRootDirSec_g;
    
-    // Super Loop
+    // super loop
     while (1) {
-        
         // list entries
         num_entries = print_directory(sec_num, &BUFFER_1);        
         
@@ -101,7 +103,7 @@ void main(void) {
             continue;
         }
         
-        entry = read_dir_entry(sec_num, entry_num, &BUFFER_1);
+        entry = read_dir_entry(sec_num, entry_num, &BUFFER_1, &filename);
         
         if ((entry >> 31) == 1) { // if error bit set
             REDLED = 0;
@@ -113,24 +115,40 @@ void main(void) {
             continue;
         }
         else { // if file
-            //Load both buffers
+            // load both buffers
             CURRENT_CLUSTER_NUM = entry & 0x0FFFFFFF;
             CURRENT_SECTOR_NUM = first_sector(CURRENT_CLUSTER_NUM);
+            
             read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_1);
             CURRENT_SECTOR_NUM++;
+            
             read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_2);
             CURRENT_SECTOR_NUM++;
+            
+            LCD_print(LINE1, 0, filename); // print song title to LCD
+            
+            // set up state
             PLAYING = 1;
-            BLUELED = 0;
             SYSTEM_STATE = DATA_SEND_1;
             EA = 1; // Enable Interrupts
         }
-        while(PLAYING && SW1){
-        go_to_sleep();
+        
+        while(PLAYING && SW1) {
+            if ((TIME % 80) == 0) {
+                /*
+                    seconds = numSeconds % 60;
+                    minutes = (numSeconds - seconds) / 60;
+                */
+                seconds = ((TIME*80) / 1000);
+                sprintf(&time_buffer, "%d:%d", (seconds - (seconds%60) / 60), (seconds % 60));
+                LCD_print(LINE2, 0, time_buffer);
+            }
+            
+            go_to_sleep();
         }
-        EA = 0;
-        BLUELED = 1;
+        
+        EA = 0; // disable interrupts and iterate
     }
     
-    while (1);
+    while (1); // if you're here, ya dun goofed
 }

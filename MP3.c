@@ -2,10 +2,9 @@
 #include "PORT.h"
 #include "SPI.h"
 #include "Directory_Functions.h"
-#include "read_sector.h"
 
-#define MP3_TIME 10
-#define MP3_RELOAD (65536-(OSC_FREQ*MP3_TIME)/(OSC_PER_INST*1000))
+#define MP3_TIMEOUT 11
+#define MP3_RELOAD (65536-(OSC_FREQ*MP3_TIMEOUT)/(OSC_PER_INST*1000))
 #define MP3_RELOAD_H (MP3_RELOAD/256)
 #define MP3_RELOAD_L (MP3_RELOAD%256)
 
@@ -15,8 +14,8 @@ extern uint8_t idata SecPerClus_g;
 extern uint16_t idata BytesPerSec_g;
 extern bit idata PLAYING;
 
-states_t SYSTEM_STATE;// = DATA_SEND_1;
-uint16_t idata BUFFER_1_PROGRESS = 0, BUFFER_2_PROGRESS = 0;
+states_t SYSTEM_STATE;
+uint16_t idata TIME = 0, BUFFER_1_PROGRESS = 0, BUFFER_2_PROGRESS = 0;
 uint32_t idata CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM;
 
 // Function to set lights based on input numbers
@@ -25,7 +24,7 @@ void set_lights(bit green, bit amber, bit yellow, bit red, bit blue) {
     AMBERLED = ~amber;
     YELLOWLED = ~yellow;
     REDLED = ~red;
-    //BLUELED = ~blue;
+    BLUELED = ~blue;
 }
 
 void MP3_clock_reset(void) {
@@ -38,7 +37,7 @@ void MP3_clock_reset(void) {
     TR1 = 1; // start timer 0
 }
 
- bit end_of_cluster(void) {
+bit end_of_cluster(void) {
     return (CURRENT_SECTOR_NUM - first_sector(CURRENT_CLUSTER_NUM)) == SecPerClus_g;
 }
 
@@ -47,6 +46,7 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
     uint8_t rec_value;
     
     TF2 = 0; // clear interrupt flag
+    TIME++;
 
     /*
     --Notes on switch state--

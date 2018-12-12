@@ -2,7 +2,7 @@
 #include "PORT.h"
 #include "main.h"
 
-void seos_init(uint8_t interval) {
+void sEOS_init(uint8_t interval) {
     uint32_t increments;
     uint16_t reload_16;
     uint8_t reload_8H, reload_8L;
