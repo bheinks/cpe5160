@@ -31,12 +31,12 @@ void MP3_clock_reset(void) {
     
     TH1 = MP3_RELOAD_H;
     TL1 = MP3_RELOAD_L;
-    
+
     TF1 = 0; // clear overflow flag
     TR1 = 1; // start timer 0
 }
 
-bit end_of_cluster(void) {
+ bit end_of_cluster(void) {
     return (CURRENT_SECTOR_NUM - first_sector(CURRENT_CLUSTER_NUM)) == SecPerClus_g;
 }
 
@@ -70,7 +70,7 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
             MP3_clock_reset();
 
             // send data to the STA01 as fast as possible
-            for(; BUFFER_1_PROGRESS < 512 && !DATA_REQ && TF1; ++BUFFER_1_PROGRESS) {
+            for(;BUFFER_1_PROGRESS < 512 && !DATA_REQ && !TF1; ++BUFFER_1_PROGRESS) {
                 SPI_transfer(BUFFER_1[BUFFER_1_PROGRESS], &rec_value);
             }
 
@@ -100,13 +100,17 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
             else if (BUFFER_1_PROGRESS == 512 && BUFFER_2_PROGRESS != 512) {
                 SYSTEM_STATE = DATA_SEND_2;
             }
-        
+            REDLED = 0;
             break;
         case FIND_CLUSTER_2:
             set_lights(0, 0, 0, 1, 0);
                     
             // calculate next cluster
             CURRENT_CLUSTER_NUM = find_next_cluster(CURRENT_CLUSTER_NUM, &BUFFER_2);
+            if (CURRENT_CLUSTER_NUM == 0x0FFFFFFF){
+                EA = 0; // Disable Interrupts
+                break;
+            }
             // update some shit with that number
             CURRENT_SECTOR_NUM = first_sector(CURRENT_CLUSTER_NUM);
 
@@ -139,7 +143,7 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
             MP3_clock_reset();
             
             // send data to the STA01 as fast as possible
-            for(; BUFFER_2_PROGRESS < 512 && !DATA_REQ && TF1; ++BUFFER_2_PROGRESS) {
+            for(; BUFFER_2_PROGRESS < 512 && !DATA_REQ && !TF1; ++BUFFER_2_PROGRESS) {
                 SPI_transfer(BUFFER_2[BUFFER_2_PROGRESS], &rec_value);
             }
             // if data request pin is inactive and buffer 1 has not sent all data
@@ -166,7 +170,7 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
             }
             // if buffer 2 has sent all data but buffer 1 has not
             else if (BUFFER_2_PROGRESS == 512 && BUFFER_1_PROGRESS != 512) {
-                SYSTEM_STATE = DATA_SEND_2;
+                SYSTEM_STATE = DATA_SEND_1;
             }
             
             break;
@@ -175,6 +179,10 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
         
             // calculate next cluster
             CURRENT_CLUSTER_NUM = find_next_cluster(CURRENT_CLUSTER_NUM, &BUFFER_1);
+            if (CURRENT_CLUSTER_NUM == 0x0FFFFFFF){
+                EA = 0; // Disable Interrupts
+                break;
+            }                
             // update some shit with that number
             CURRENT_SECTOR_NUM = first_sector(CURRENT_CLUSTER_NUM);
 

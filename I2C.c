@@ -64,7 +64,7 @@ uint8_t I2C_acknowledge(void) {
 }
 
 uint8_t I2C_write(uint8_t device_addr, uint16_t int_addr, uint8_t int_addr_sz, uint8_t num_bytes, uint8_t * byte_array) {
-    uint8_t i, send_value;
+    uint8_t i;
 
     SDA = 1;
     SCL = 1;

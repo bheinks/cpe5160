@@ -4,7 +4,6 @@
 #include "PORT.h"
 #include "main.h"
 #include "Directory_Functions.h"
-#include "print_bytes.h"
 #include "read_sector.h"
 
 bit print_long_name(uint16_t entry, uint8_t entry_num, uint8_t * array_in);
@@ -342,7 +341,7 @@ uint32_t find_next_cluster(uint32_t Cluster_num, uint8_t xdata * array_name){
     return read((Cluster_num*4) % BytesPerSec_g, array_name, 4) & 0x0FFFFFFF;
 }
 
-void open_file(uint32_t Cluster, uint8_t xdata * array_in) {
+/* void open_file(uint32_t Cluster, uint8_t xdata * array_in) {
     uint8_t i, cont;
     uint32_t sec_num, clus_num = Cluster;
     
@@ -368,4 +367,4 @@ void open_file(uint32_t Cluster, uint8_t xdata * array_in) {
         
         clus_num = find_next_cluster(clus_num, array_in);
     } while (1);
-}
+}n */

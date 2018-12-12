@@ -84,7 +84,6 @@ void main(void) {
    
     // Super Loop
     while (1) {
-        EA = 0; // Disable Interrupts
         
         // list entries
         num_entries = print_directory(sec_num, &BUFFER_1);        
@@ -121,6 +120,7 @@ void main(void) {
         }
         
         go_to_sleep();
+        while(1);
     }
     
     while (1);
