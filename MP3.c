@@ -27,9 +27,9 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
         case DATA_IDLE_1:
             set_lights(0, 1, 0, 0, 0);
         
-            if (1 /* DR-active */) {
-                SYSTEM_STATE = DATA_SEND_1;
-            }
+            //if (1 /* DR-active */) {
+            //    SYSTEM_STATE = DATA_SEND_1;
+            //}
         
             break;
         case DATA_SEND_1:

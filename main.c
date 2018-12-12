@@ -100,7 +100,14 @@ void main(void) {
             sec_num = first_sector(entry & 0x0FFFFFFF);
         }
         else { // if file
-            open_file(entry & 0x0FFFFFFF, &block_data_g);
+            //open_file(entry & 0x0FFFFFFF, &block_data_g);
+            CURRENT_CLUSTER_NUM = entry & 0x0FFFFFFF;
+            CURRENT_SECTOR_NUM = first_sector(CURRENT_CLUSTER_NUM);
+            read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_1);
+            CURRENT_SECTOR_NUM++;
+            read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_2);
+            CURRENT_SECTOR_NUM++;
+            
         }
         
         go_to_sleep();
