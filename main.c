@@ -51,6 +51,13 @@ void system_init(void) {
     // Set SPI clock to 25 MHz
     SPI_master_init(25000000UL);
     
+    // reset STA013
+    STA013_RESET = 0;
+	STA013_RESET = 1;
+    
+    // initialize STA013
+    STA013_init();
+    
     // mount SD card
     mount_drive();
 }
