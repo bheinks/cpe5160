@@ -13,7 +13,7 @@ sbit yellow = P2^5;
 sbit red = P2^4;
 
 uint8_t send_command(uint8_t command, uint32_t argument) {
-    uint8_t idata rec_value, argument_LSB, argument_byte1, argument_byte2, argument_MSB, command_end, return_value, error_flag;
+    uint8_t rec_value, argument_LSB, argument_byte1, argument_byte2, argument_MSB, command_end, return_value, error_flag;
     
     // check if CMD value is valid (less than 64)
     if (command < 64) {

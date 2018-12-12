@@ -28,7 +28,7 @@ extern uint32_t idata FirstRootDirSec_g, CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM
 extern uint8_t idata SecPerClus_g;
 extern states_t SYSTEM_STATE;
 
-bit idata PLAYING;
+bit idata PLAYING, PAUSE;
 
 // SD card data blocks
 uint8_t xdata BUFFER_1[512];
@@ -121,15 +121,18 @@ void main(void) {
             read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_2);
             CURRENT_SECTOR_NUM++;
             PLAYING = 1;
-            BLUELED = 0;
+            PAUSE = 0;
             SYSTEM_STATE = DATA_SEND_1;
             EA = 1; // Enable Interrupts
         }
         while(PLAYING && SW1){
-        go_to_sleep();
+            if(SW2 == 0){
+                PAUSE = 1;
+            }
+
+            go_to_sleep();
         }
         EA = 0;
-        BLUELED = 1;
     }
     
     while (1);

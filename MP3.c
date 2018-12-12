@@ -13,7 +13,7 @@
 extern uint8_t xdata BUFFER_1[512], BUFFER_2[512];
 extern uint8_t idata SecPerClus_g;
 extern uint16_t idata BytesPerSec_g;
-extern bit idata PLAYING;
+extern bit idata PLAYING, PAUSE;
 
 states_t SYSTEM_STATE;// = DATA_SEND_1;
 uint16_t idata BUFFER_1_PROGRESS = 0, BUFFER_2_PROGRESS = 0;
@@ -25,7 +25,7 @@ void set_lights(bit green, bit amber, bit yellow, bit red, bit blue) {
     AMBERLED = ~amber;
     YELLOWLED = ~yellow;
     REDLED = ~red;
-    //BLUELED = ~blue;
+    BLUELED = ~blue;
 }
 
 void MP3_clock_reset(void) {
@@ -66,7 +66,11 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
             break;
         case DATA_SEND_1:
             set_lights(0, 0, 1, 0, 0);
-        
+            while(PAUSE){ //Pause if pause button pressed
+                if(SW3 == 0){
+                    PAUSE = 0;
+                }
+            }                
             MP3_clock_reset();
 
             // send data to the STA01 as fast as possible
@@ -141,7 +145,13 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
             break;
         case DATA_SEND_2:
             set_lights(1, 0, 1, 0, 0);
-
+        
+            while(PAUSE){ //Pause if pause button pressed
+                if(SW3 == 0){
+                    PAUSE = 0;
+                }
+            }   
+        
             MP3_clock_reset();
             
             // send data to the STA01 as fast as possible
