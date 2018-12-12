@@ -84,6 +84,8 @@ void main(void) {
    
     // Super Loop
     while (1) {
+        EA = 0; // Disable Interrupts
+        
         // list entries
         num_entries = print_directory(sec_num, &BUFFER_1);        
         
@@ -107,12 +109,15 @@ void main(void) {
             sec_num = first_sector(entry & 0x0FFFFFFF);
         }
         else { // if file
+            //Load both buffers
             CURRENT_CLUSTER_NUM = entry & 0x0FFFFFFF;
             CURRENT_SECTOR_NUM = first_sector(CURRENT_CLUSTER_NUM);
             read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_1);
             CURRENT_SECTOR_NUM++;
             read_sector(CURRENT_SECTOR_NUM, SecPerClus_g, &BUFFER_2);
             CURRENT_SECTOR_NUM++;
+            
+            EA = 1; // Enable Interrupts
         }
         
         go_to_sleep();
