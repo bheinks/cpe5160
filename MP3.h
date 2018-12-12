@@ -16,7 +16,7 @@ typedef enum {
 } states_t;
 
 // struct instance representing the system state
-states_t SYSTEM_STATE = DATA_IDLE_1;
+states_t SYSTEM_STATE = DATA_SEND_1;
 uint32_t TIMER = 0, ALT_TIMER = 0;
 
 void play_music_isr(void);
