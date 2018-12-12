@@ -29,7 +29,7 @@ extern uint16_t idata TIME;
 extern uint8_t idata SecPerClus_g;
 extern states_t SYSTEM_STATE;
 
-bit idata PLAYING;
+bit idata PLAYING, PAUSE;
 
 // SD card data blocks
 uint8_t xdata BUFFER_1[512];
@@ -129,11 +129,16 @@ void main(void) {
             
             // set up state
             PLAYING = 1;
+            PAUSE = 0;
             SYSTEM_STATE = DATA_SEND_1;
             EA = 1; // Enable Interrupts
         }
-        
-        while(PLAYING && SW1) {
+
+        while(PLAYING && SW1){
+            if(SW2 == 0){
+                PAUSE = 1;
+            }
+
             if ((TIME % 80) == 0) {
                 /*
                     seconds = numSeconds % 60;
@@ -143,11 +148,10 @@ void main(void) {
                 sprintf(&time_buffer, "%d:%d", (seconds - (seconds%60) / 60), (seconds % 60));
                 LCD_print(LINE2, 0, time_buffer);
             }
-            
+
             go_to_sleep();
         }
-        
-        EA = 0; // disable interrupts and iterate
+        EA = 0;
     }
     
     while (1); // if you're here, ya dun goofed
