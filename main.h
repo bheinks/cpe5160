@@ -55,9 +55,9 @@ typedef int  int16_t;
 typedef long int32_t;
 
 // Interrupts (see Chap 7)  
-#define Timer_0_Overflow 1
-#define Timer_1_Overflow 3
-#define Timer_2_Overflow 5
+#define TIMER_0_OVERFLOW 1
+#define TIMER_1_OVERFLOW 3
+#define TIMER_2_OVERFLOW 5
 
 #endif
 
