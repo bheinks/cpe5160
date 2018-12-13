@@ -272,60 +272,63 @@ uint32_t read_dir_entry(uint32_t sector_num, uint16_t entry, uint8_t xdata * arr
     uint32_t idata sector = sector_num, return_clus = 0;
     uint16_t idata i = 0, entries = 0;
     uint8_t temp8, attr, error_flag, j;
-    uint8_t * values = array_in;
+    uint8_t * values;
 
+    values = array_in;
+    error_flag = read_sector(sector, BYTES_PER_SEC, values);
+    
     if (error_flag == NO_ERROR) {
         do {
-            temp8 = read(i, values, 1); // read first byte to see if empty
+            temp8 = read(0+i, values, 1); // read first byte to see if empty
 
             if ((temp8 != 0xE5) && (temp8 != 0x00)) {  
                 attr = read(0x0b+i, values, 1);
 
                 if ((attr&0x0E) == 0) { // if hidden do not print
                     entries++;
-                        
+                    
                     for (j = 0; j < 8; j++) {
                         filename[j] = read(i+j, values, 1);
                     }
-                        
+                    
                     if (entries == entry) {
                         if (FAT_TYPE == FAT32) {
                             return_clus = read(21+i, values, 1);
-                            return_clus &= 0x0F; // makes sure upper four bits are clear
-                            return_clus = return_clus << 8;
+                            return_clus &= 0x0F;                // makes sure upper four bits are clear
+                            return_clus <<= 8;
                             return_clus |= read(20+i, values, 1);
-                            return_clus = return_clus << 8;
+                            return_clus <<= 8;
                         }
-
+                        
                         return_clus |= read(27+i, values, 1);
-                        return_clus = return_clus << 8;
+                        return_clus <<= 8;
                         return_clus |= read(26+i, values, 1);
 
                         attr = read(0x0b+i, values, 1);
-                        
                         if (attr&0x10) {
                             return_clus |= DIRECTORY_BIT;
                         }
-
-                        temp8=0;     // forces a function exit
+                        
+                        temp8 = 0; // forces a function exit
                     }
                 }
             }
             i += 32; // next entry
+
             if (i > 510) {
                 sector++;
 
                 if ((sector - sector_num) < SEC_PER_CLUS) {
                     error_flag = read_sector(sector, BYTES_PER_SEC, values);
-                    
+                      
                     if (error_flag != NO_ERROR) {
                         return_clus = NO_ENTRY_FOUND;
-                        temp8 = 0; 
+                        temp8=0; 
                     }
                     i = 0;
                 }
                 else {
-                  temp8 = 0; // forces a function exit
+                    temp8 = 0; // forces a function exit
                 }
             }
         } while (temp8 != 0);

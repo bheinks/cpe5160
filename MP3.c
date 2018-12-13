@@ -26,7 +26,7 @@ uint16_t idata BUFFER_1_PROGRESS = 0, BUFFER_2_PROGRESS = 0;
 uint32_t idata CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM, TIME = 0;
 
 void display_time(void) {
-    uint8_t seconds = TIME / 1000;
+    uint16_t seconds = TIME / 1000;
         
     sprintf(&time_buffer, "%d:%02d", (seconds / 60), (seconds % 60));
     LCD_print(LINE2, 0, time_buffer);
