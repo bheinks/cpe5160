@@ -6,35 +6,25 @@
 #include "PORT.h"
 #include "delay.h"
 
-// LEDs
-sbit green = P2^7;
-sbit orange = P2^6;
-sbit yellow = P2^5;
-sbit red = P2^4;
-
 uint8_t send_command(uint8_t command, uint32_t argument) {
-    uint8_t rec_value, argument_LSB, argument_byte1, argument_byte2, argument_MSB, command_end, return_value, error_flag;
+    uint8_t rec_value, argument_LSB, argument_byte1, argument_byte2, argument_MSB, command_end, error_flag;
     
     // check if CMD value is valid (less than 64)
-    if (command < 64) {
-        return_value = NO_ERROR;
-    }
-    else {
-        return_value = ILLEGAL_COMMAND;
-        return return_value;
+    if (command >= 64) {
+        return ILLEGAL_COMMAND;
     }
     
     // append start and transmission bits to the 6 bit command
     command |= 0x40;
     
-    // set commandend based on necessary CRC7 and end bit
+    // set command_end based on necessary CRC7 and end bit
     if (command == 0x40) {      // CMD0
         command_end = 0x95;
     }
     else if (command == 0x48) { // CMD8
         command_end = 0x87;
     }
-    else {                     // all other commands require no checksum
+    else {                      // all other commands require no checksum
         command_end = 0x01;
     }
     
@@ -47,48 +37,39 @@ uint8_t send_command(uint8_t command, uint32_t argument) {
     // send 6 byte command while checking for errors
     error_flag = SPI_transfer(command, &rec_value);
     if (error_flag != NO_ERROR) {
-        return_value = SPI_ERROR;
-        return return_value;
+        return SPI_ERROR;
     }
     
     error_flag = SPI_transfer(argument_MSB, &rec_value);
     if (error_flag != NO_ERROR) {
-        return_value = SPI_ERROR;
-        return return_value;
+        return SPI_ERROR;
     }    
     
     error_flag = SPI_transfer(argument_byte2, &rec_value);
     if (error_flag != NO_ERROR) {
-        return_value = SPI_ERROR;
-        return return_value;
+        return SPI_ERROR;
     }    
     
     error_flag = SPI_transfer(argument_byte1, &rec_value);
     if (error_flag != NO_ERROR) {
-        return_value = SPI_ERROR;
-        return return_value;
+        return SPI_ERROR;
     }    
     
     error_flag = SPI_transfer(argument_LSB, &rec_value);
     if (error_flag != NO_ERROR) {
-        return_value = SPI_ERROR;
-        return return_value;
+        return SPI_ERROR;
     }    
     
     error_flag = SPI_transfer(command_end, &rec_value);
     if (error_flag != NO_ERROR) {
-        return_value = SPI_ERROR;
-        return return_value;
+        return SPI_ERROR;
     }
     
-    return return_value;
+    return NO_ERROR;
 }
 
 uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array) {
-    uint8_t SPI_val, count, error_flag, response;
-    
-    response = NO_ERROR;
-    count = 0;
+    uint8_t SPI_val, count = 0, error_flag;
 
     // Keep transmitting until a response is valid received or timeout occurs
 	do {
@@ -98,12 +79,10 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array) {
     
 	// Error handling
     if (error_flag != NO_ERROR) {
-        response = SPI_ERROR;
-        printf("SPI_ERROR\n");
+        return SPI_ERROR;
     }
 	else if (count == 0) {
-		response = TIMEOUT_ERROR;
-        printf("TIMEOUT_ERROR\n");
+		return TIMEOUT_ERROR;
     }
     else {
         *byte_array = SPI_val;
@@ -118,20 +97,18 @@ uint8_t receive_response(uint8_t num_bytes, uint8_t *byte_array) {
             }
         }
         else {
-            response = COMM_ERROR;
-            printf("COMM_ERROR\n");
-            printf("0x%2.2Bx\n", SPI_val);
-            return response;
+            return COMM_ERROR;
         }
     }
     
     // end with sending one last 0xFF out of the SPI port
     error_flag = SPI_transfer(0xFF, &SPI_val);
-    return response;
+
+    return NO_ERROR;
 }
 
 uint8_t SD_card_init(void) {
-    uint8_t idata receive_array[8], error_flag, timeout, return_value, i, error_message;
+    uint8_t idata receive_array[8], error_flag, timeout = 1, return_value, i, error_message;
 
     timeout = 1;
     
@@ -429,10 +406,8 @@ uint8_t SD_card_init(void) {
 }
 
 uint8_t read_block(uint16_t num_bytes, uint8_t * byte_array) {
-    uint8_t SPI_val, error_flag;
-    uint16_t idata count;
-    error_flag = NO_ERROR;
-    count = 0;
+    uint8_t SPI_val, error_flag = NO_ERROR;
+    uint16_t idata count = 0;
     
     // keep transmitting until a error_flag is received or timeout occurs
 	do {

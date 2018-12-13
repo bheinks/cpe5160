@@ -3,6 +3,6 @@
 
 #include "main.h"
 
-uint8_t STA013_init(void);
+uint8_t STA013_init(uint8_t device_addr);
 
 #endif

@@ -1,5 +1,4 @@
 #include "SPI.h"
-#include <stdio.h>
 
 uint8_t SPI_master_init(uint32_t clock_freq) {
     uint8_t divider, return_value;

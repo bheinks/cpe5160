@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-// possible system states
+// system states
 typedef enum {
     DATA_IDLE_1,
     DATA_SEND_1,
@@ -14,7 +14,5 @@ typedef enum {
     LOAD_BUFFER_2,
     FIND_CLUSTER_2
 } states_t;
-
-void play_music_isr(void);
 
 #endif
