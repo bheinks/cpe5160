@@ -24,8 +24,7 @@
 #include "MP3.h"
 #include "LCD.h"
 
-extern uint32_t idata FirstRootDirSec_g, CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM;
-extern uint16_t idata TIME;
+extern uint32_t idata FirstRootDirSec_g, CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM, TIME;
 extern uint8_t idata SecPerClus_g;
 extern states_t SYSTEM_STATE;
 
@@ -76,7 +75,7 @@ void system_init(void) {
 }
 
 void main(void) {
-    uint8_t idata time_buffer[8], filename[8], seconds;
+    uint8_t idata filename[8];
     uint16_t idata num_entries, entry_num;
     uint32_t idata entry, sec_num;
     
@@ -139,20 +138,11 @@ void main(void) {
                 PAUSE = 1;
             }
 
-            if (((3*TIME) % 250) == 0) {
-                /*
-                    seconds = numSeconds % 60;
-                    minutes = (numSeconds - seconds) / 60;
-                */
-                seconds = (3*TIME)/250;
-                
-                sprintf(&time_buffer, "%d:%d", (seconds / 60), (seconds % 60));
-                LCD_print(LINE2, 0, time_buffer);
-            }
-
             go_to_sleep();
         }
         EA = 0;
+        TIME = 0;
+        LCD_write(COMMAND, CLEAR_DISPLAY);
     }
     
     while (1); // if you're here, ya dun goofed

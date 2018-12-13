@@ -1,7 +1,11 @@
+#include <stdio.h>
+
 #include "MP3.h"
 #include "PORT.h"
 #include "SPI.h"
 #include "Directory_Functions.h"
+#include "LCD.h"
+
 
 #define MP3_TIMEOUT 11
 #define MP3_RELOAD (65536-(OSC_FREQ*MP3_TIMEOUT)/(OSC_PER_INST*1000))
@@ -15,8 +19,9 @@ extern uint16_t idata BytesPerSec_g;
 extern bit idata PLAYING, PAUSE;
 
 states_t SYSTEM_STATE;
-uint16_t idata TIME = 0, BUFFER_1_PROGRESS = 0, BUFFER_2_PROGRESS = 0;
-uint32_t idata CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM;
+uint8_t idata time_buffer[8];
+uint16_t idata BUFFER_1_PROGRESS = 0, BUFFER_2_PROGRESS = 0;
+uint32_t idata CURRENT_CLUSTER_NUM, CURRENT_SECTOR_NUM, TIME = 0;
 
 // Function to set lights based on input numbers
 void set_lights(bit green, bit amber, bit yellow, bit red, bit blue) {
@@ -44,9 +49,10 @@ bit end_of_cluster(void) {
 // Function to control traffic light system state
 void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
     uint8_t rec_value;
+    uint16_t seconds;
     
     TF2 = 0; // clear interrupt flag
-    TIME++;
+    TIME += 12;
 
     /*
     --Notes on switch state--
@@ -58,6 +64,11 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
     switch (SYSTEM_STATE) {
         case DATA_IDLE_1:
             set_lights(0, 1, 0, 0, 0);
+            
+            seconds = TIME / 1000;
+                
+            sprintf(&time_buffer, "%d:%02d", (seconds / 60), (seconds % 60));
+            LCD_print(LINE2, 0, time_buffer);
         
             if (!DATA_REQ) {
                 SYSTEM_STATE = DATA_SEND_1;
@@ -137,6 +148,11 @@ void play_music_isr(void) interrupt TIMER_2_OVERFLOW {
             break;
         case DATA_IDLE_2:
             set_lights(1, 1, 0, 0, 0);
+        
+            seconds = TIME / 1000;
+                
+            sprintf(&time_buffer, "%d:%02d", (seconds / 60), (seconds % 60));
+            LCD_print(LINE2, 0, time_buffer);        
         
             if (!DATA_REQ) {
                 SYSTEM_STATE = DATA_SEND_2;
